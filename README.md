@@ -1,2 +1,8 @@
 # DATS6103 Introduction to Data Mining  
-## Team 2 by Brooklyn Chen, Manojkumar Yerraguntla, Nayaeun Kwon
+## Project by Team 2
+
+### Team Members:
+*Brooklyn Chen
+*Manojkumar Yerraguntla
+*Nayaeun Kwon
+

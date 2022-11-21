@@ -1,5 +1,5 @@
-# Data Science Stem Salaries Project
-## DATS6103 Introduction to Data Mining  
+# DATS6103 Introduction to Data Mining 
+## Data Science Stem Salaries Project
 
 ## Team 2 Members:
 * Brooklyn Chen

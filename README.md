@@ -10,4 +10,4 @@
 * 
 
 ### Assignments:
-* 
+* [Topic Proposal](https://docs.google.com/document/d/1ia8Xj7ZW0nW6T2gsCz67eQ5jivJcp0QXRu3YFIinOjQ/edit)

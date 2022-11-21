@@ -14,5 +14,6 @@ The main objective of this project is to estimate the salaries of the data scien
 * This dataset is collected from Kaggle
 
 ## Assignments:
+* [To-do list](https://docs.google.com/spreadsheets/d/1yPJSn-yDfvQ-3118WoDbA2DeTPzf5cn0wm5vJTlNHVU/edit#gid=0)
 * [Topic Proposal](https://docs.google.com/document/d/1ia8Xj7ZW0nW6T2gsCz67eQ5jivJcp0QXRu3YFIinOjQ/edit)
 * [Presentation Slides](https://docs.google.com/presentation/d/19ibFQGRhCfCJAh0WSLkrGyeyzMUGbC97yX_hPhI6mLM/edit#slide=id.p)

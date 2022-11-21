@@ -2,7 +2,7 @@
 ## Project by Team 2
 
 ### Team Members:
-*Brooklyn Chen
-*Manojkumar Yerraguntla
-*Nayaeun Kwon
+* Brooklyn Chen
+* Manojkumar Yerraguntla
+* Nayaeun Kwon
 

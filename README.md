@@ -10,7 +10,7 @@
 The main objective of this project is to estimate the salaries of the data science roles based on various attributes, including numerical and categorical values, using Exploratory Data Analysis (EDA).
 
 ## Datasets:
-* [Download Datasets]()
+* [Download Datasets](https://drive.google.com/drive/u/3/folders/1pIsFSHHUSHWwmoydmRdd97E-ci0lYHwB)
 * This dataset is collected from Kaggle
 
 ## Assignments:

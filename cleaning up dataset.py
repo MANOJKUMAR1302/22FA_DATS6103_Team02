@@ -9,15 +9,14 @@ pd.set_option('display.precision', 3)
 
 #%%
 old_df=pd.read_csv('Levels_Fyi_Salary_Data.csv')
-#%%
+
 old_df.info()
 old_df.head()
-type(old_df)
+
 #%%
-old_df.astype({'basesalary':'int'})
-# %%
 df = old_df[['company','title','location','yearsofexperience','yearsatcompany']].copy()
 
-df['yearlysalary'] = old_df.iloc[:, 'totalyearlycompensation'] + old_df.iloc[:,'basesalary']
-
+df['yearlysalary'] = old_df['totalyearlycompensation'] + old_df['basesalary']
+# %%
+df.to_csv('salary_data', index=False)
 # %%

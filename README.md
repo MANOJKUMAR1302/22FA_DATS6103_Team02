@@ -3,8 +3,8 @@
 
 ## Team 2 Members:
 * Brooklyn Chen
-* Manojkumar Yerraguntla
-* Nayaeun Kwon
+* Manojkumar Yerraguntla (@MANOJKUMAR1302)
+* Nayaeun Kwon (@Nayaeun)
 
 ## Topic Proposal:
 The main objective of this project is to estimate the salaries of the data science roles based on various attributes, including numerical and categorical values, using Exploratory Data Analysis (EDA).

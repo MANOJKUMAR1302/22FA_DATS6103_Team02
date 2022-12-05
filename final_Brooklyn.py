@@ -69,6 +69,9 @@ df2=df2[df2['yearsatcompany'] > np.percentile(df2['yearsatcompany'],25)-n*IQR_2]
 print ("Shape Of The After Ouliers: ",df2.shape)
 
 
+# Correlation matrix
+corr_matrix = df2.corr()
+print(corr_matrix)
 
 
 
@@ -104,8 +107,17 @@ summary, results = rp.ttest(group1= top10['yearlysalary'], group1_name= "top10",
 print(summary)
 print(results)
 
+
 # The average yearlysalary for top 10 company, M= 10345.0 , was statistically signigicantly higher than those not-top-10 companies.
 # M= 320757.462; t= 23.245, p < 0.05
+
+
+
+# Add a Boolean column, 'topcompany' based on 'company'
+# If the company is in top 10 company present '1', else present '0'
+
+df2['topcompany']=np.where((df2['company'].isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil", "McKesson"])) & (~df2['company'].isin([120,128])),1,0)
+
 
 #%%
 
@@ -138,9 +150,89 @@ from scipy.stats import pearsonr
 corr, _ = pearsonr(df2['yearsatcompany'], df2['yearlysalary'])
 print('Pearsons correlation: %.3f' % corr)
 
-# Correlation matrix
-corr_matrix = df2.corr()
-print(corr_matrix)
+
+
 
 #%%
+### Model Building
+# part (a) Model1 - sklearn
+# 
+# Use train-test split (4:1 split) and sklearn LinearRegression, 
+# build a linear model for 'yearlysalary'
+# 
+# Find the intercept and the coefficients of the model. And score the model using 
+# both the train set and the test set.
+# 
+# 
+
+import numpy as np
+from sklearn import linear_model
+from sklearn.model_selection import train_test_split
+
+
+xm1 = df2.iloc[ :,3:5+6]
+ym1 = df2[['yearlysalary']]
+print(type(xm1))
+print(type(ym1))
+
+X_train1, X_test1, y_train1, y_test1 = train_test_split(xm1, ym1, test_size = 0.25, random_state=43)
+
+
+model1 = linear_model.LinearRegression()
+model1.fit( X_train1, y_train1 )
+pred1 = model1.predict(X_test1)
+model1.score(X_test1, y_test1)
+print('score (train):', model1.score(X_train1, y_train1))
+print('score (test):', model1.score(X_test1, y_test1))
+print('intercept:', model1.intercept_)
+print('coef_:', model1.coef_)
+
+
+
+#%%
+# part (b) Model1 - statsmodels
+# 
+# Use statsmodels OLS to build the same model
+# 
+# 
+
+from statsmodels.formula.api import ols
+import statsmodels.api as sm
+
+model0 = ols(formula='yearlysalary ~ yearsofexperience+topcompany', data=df2).fit()
+print( model0.summary() )
+
+
+
+
+#%%
+# part (c) Model2 - statsmodels 
+# From the previous result, we should drop the regressor with coefficients of high p-value. 
+# 
+# 
+
+model2 = ols(formula='yearlysalary ~ yearsofexperience+topcompany', data=df2).fit()
+print( model2.summary() )
+
+
+#%%
+# part (d) Model2 - sklearn
+# Now with this modified set of regressors, build model2 
+# with sklearn LinearRegression 
+
+# Find the intercept and the coefficients of the model. And score the model using 
+# both the train set and the test set.
+# 
+
+model2 = linear_model.LinearRegression()
+model2.fit( X_train1, y_train1 )
+pred2 = model1.predict(X_test1)
+model2.score(X_test1, y_test1)
+print('score (train):', model2.score(X_train1, y_train1))
+print('score (test):', model2.score(X_test1, y_test1))
+print('intercept:', model2.intercept_)
+print('coef_:', model2.coef_)
+
+# %%
+
 

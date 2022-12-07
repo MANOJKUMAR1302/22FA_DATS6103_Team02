@@ -16,19 +16,22 @@ execute:
 
 ```{python}
 #| output: false
-import numpy as np
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-import rfit 
-import plotly.express as px
 import plotly.express as px
 import scipy.stats as stats
+import rfit 
 import sklearn
 from sklearn.datasets import load_boston 
-import researchpy as rp
+# import researchpy as rp
 from scipy.stats import pearsonr
 
+```
+
+```{python}
+#| output: false
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
 pd.set_option('display.width', 1000)
@@ -37,8 +40,6 @@ pd.set_option('display.precision', 3)
 ```
 
 ```{python}
-#| output: false
-
 # Setting Dataset
 old_df=pd.read_csv('Levels_Fyi_Salary_Data.csv')
 print(old_df.info())
@@ -51,247 +52,330 @@ df['yearlysalary'] = old_df['totalyearlycompensation'] + old_df['basesalary']
 df['timestamp'] = pd.to_datetime(df['timestamp']).dt.strftime('%Y')
 
 df.to_csv('salary_data', index=False)
-```
-
-```{python}
-#| output: false
-df.info()
 df.head()
 df.describe()
 ```
 
 
-# 1. Will the salary be affected by different employers? B 
+# Introduction
 
-List all the companys in this dataframe
+
+# Looking at Dataset for an Overview
+
+Before delving into datasets, I will figure out what the datasets look like and which difference is distinguished between each world dataset, and will modify particular things for analysis such as NAs observation or changing the type of variables. 
+
+## 
+
 ```{python}
-print(f"the unique values:\n{pd.unique(df.company)}")
+from IPython.display import display, Markdown
+display(Markdown("""
+There are {obs} observations, {var} variables, and no null values in world1 data.
+""".format(obs = len(orig_world1), var = len(orig_world1.columns))))
+
+print (orig_world1.head())
+
+print (orig_world1.info())
 ```
 
-Removing the Outliers of yearlysalary
+As for the type of variables, *marital*, *gender*, *ethnic*, and *industry* variables are converted into categirical variable. 
 
 ```{python}
-df1 = df.copy()
-print ("Shape Of The Before Ouliers: ",df.shape)
-n=1.5
-IQR_1 = np.percentile(df1['yearlysalary'],75) - np.percentile(df1['yearlysalary'],25)
-#outlier = Q3 + n*IQR 8
-df1=df1[df1['yearlysalary'] < np.percentile(df1['yearlysalary'],75)+n*IQR_1]
-#outlier = Q1 - n*IQR 
-df1=df1[df1['yearlysalary'] > np.percentile(df1['yearlysalary'],25)-n*IQR_1]
-print ("Shape Of The After Ouliers: ",df1.shape)
-```
+#| output: false
+world1 = orig_world1.copy()
 
-Removing the Outliers of yearsatcompany
-```{python}
-df2 = df1.copy()
-print ("Shape Of The Before Ouliers: ",df.shape)
-n=1.5
-IQR_2 = np.percentile(df2['yearsatcompany'],75) - np.percentile(df2['yearsatcompany'],25)
-#outlier = Q3 + n*IQR 
-df2=df2[df2['yearsatcompany'] < np.percentile(df2['yearsatcompany'],75)+n*IQR_2]
-#outlier = Q1 - n*IQR 
-df2=df2[df2['yearsatcompany'] > np.percentile(df2['yearsatcompany'],25)-n*IQR_2]
-print ("Shape Of The After Ouliers: ",df2.shape)
-
-```
-
-Boxplot
-```{python}
-sns.boxplot(df['yearlysalary']).set_title('Before removing outliers')
+world1['marital'] = world1['marital'].apply(str)
+world1['gender'] = world1['gender'].apply(str)
+world1['ethnic'] = world1['ethnic'].apply(str)
+world1['industry'] = world1['industry'].apply(str)
 ```
 
 ```{python}
-sns.boxplot(df2['yearlysalary']).set_title('After removing outliers')
+world1.dtypes
 ```
 
-
-Independent-Sample T Test (2 groups)
-
-Top 10 companies in the United States (https://fortune.com/fortune500/)
-
-H0: The means for the two populations are equal.
-H1: The means for the two populations are not equal.
+Let's look at statistic summary for numerical variables that are *age*, *education*, and *income*.
 
 ```{python}
-top10 = df2[df2.company.isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil"
-"McKesson"])]
-rfit.dfchk(top10)
+# world1 statistic summary
+print (world1.describe())
 ```
 
-```{python}
-not10 = df2[~df2.company.isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil"
-"McKesson"])]
-rfit.dfchk(not10)
-
-summary, results = rp.ttest(group1= top10['yearlysalary'], group1_name= "top10",
-                            group2= not10['yearlysalary'], group2_name= "not10")
-
-print(summary)
-print(results)
-
-```
-The average yearlysalary for top 10 company, M= 10345.0 , was statistically signigicantly higher than those not-top-10 companies.
-M= 320757.462; t= 23.245, p < 0.05
-
-# 2. Is salary affected by the role offered? 
+## **world2** data
 
 ```{python}
-df = pd.read_csv("salary_data")
-print (df.info())
-print (df.isnull().sum())
-print (df.head())
-print (df['title'].nunique())
+from IPython.display import display, Markdown
+display(Markdown("""
+There are {obs} observations, {var} variables and no null values in world2 data.
+""".format(obs = len(orig_world2), var = len(orig_world2.columns))))
+
+print (orig_world2.head())
+
+print (orig_world2.info())
 ```
 
-# %%
-# Is salary affected by the role offered? 
+Like **world1** data, *marital*, *gender*, *ethnic*, and *industry* variables are converted into categirical variable in **world2** data as well. 
 
 ```{python}
-cate_title = list(set(list(df['title'])))
-# ['Management Consultant', 'Marketing', 'Product Designer', 'Human Resources', 'Product Manager', 'Software Engineering Manager', 'Solution Architect', 'Business Analyst', 'Sales', 'Hardware Engineer', 'Mechanical Engineer', 'Recruiter', 'Data Scientist' 'Technical Program Manager', 'Software Engineer']
-len(cate_title) # 15
+world2 = orig_world2.copy()
 
-print (df['title'].value_counts())
-fig = px.pie(df, names = 'title', title = 'Title')
-fig.show()
+world2['marital'] = world2['marital'].apply(str)
+world2['gender'] = world2['gender'].apply(str)
+world2['ethnic'] = world2['ethnic'].apply(str)
+world2['industry'] = world2['industry'].apply(str)
+
+print (world2.dtypes)
 ```
 
-Avg salary by title
+Let's also look at statistic summary for numerical variables that are *age*, *education*, and *income* for **world2** dataset.
+
 ```{python}
-
-avgsalary = avgsalary = df.groupby('title').mean()['yearlysalary'].reset_index()
-print (avgsalary)
-
-
-avgsalary.plot(kind = 'bar', x = 'title', y = 'yearlysalary', title = 'Average Salary per Job Title', figsize=(15,8))
-plt.show()
-
+# world2 statistic summary
+print (world2.describe())
 ```
 
+So far, there is no special difference between the two worlds. The result of the statistic summary is even almost the same.
+
+Let's look into the difference deeper between each variable for the two worlds. 
+
+# Slicing Dataset
+
+## Income 
+
+First, let's look at the difference between **income** that is a respondent variable for income inequality analaysis.
+
 ```{python}
-# plt.boxplot(df['title'])
+# world1 income
+plt.hist([world1['income00'],world2['income00']], label=['world1','world2'],edgecolor='black', linewidth=1)
+plt.xlabel('income', fontsize=12)
+# plt.xticks(fontsize = 15) x scale font size
+plt.ylabel('Frequency', fontsize=12)
+plt.legend(loc='upper right')
 ```
 
+## Other variables
 ```{python}
-# sns.set(style="whitegrid")
+#| column: body
 
-# df = sns.load_dataset("df")
-# print(df.head())
-# print(df.tail())
-# print(df.info())
-# print(df.shape)
+fig, axs = plt.subplots(3,2, figsize=(10,10))
+
+# compare age
+
+axs[0,0].hist([world1['age00'],world2['age00']], label=['world1','world2'],edgecolor='black', linewidth=1)
+axs[0, 0].set_title('age')
+
+# compare education
+axs[0,1].hist([world1['education'],world2['education']], label=['world1','world2'],edgecolor='black', linewidth=1)
+axs[0, 1].set_title('education')
+
+# compare martial
+axs[1,0].hist([world1['marital'],world2['marital']], label=['world1','world2'],edgecolor='black', linewidth=1)
+axs[1,0].set_title('marital')
+
+# compare gender
+axs[1,1].hist([world1['gender'],world2['gender']], label=['world1','world2'],edgecolor='black', linewidth=1)
+axs[1,1].set_title('gender')
+
+# compare ethnic
+axs[2,0].hist([world1['ethnic'],world2['ethnic']], label=['world1','world2'],edgecolor='black', linewidth=1)
+axs[2,0].set_title('ethnic')
+
+# compare industry
+
+axs[2,1].hist([world1['industry'],world2['industry']], label=['world1','world2'],edgecolor='black', linewidth=1)
+axs[2,1].set_title('industry')
 ```
 
+According to the comparison between the two world datasets, each dataset looks like similar, but I will investigate more in detail of income distribution by each variable. 
+
+## **income** distribution by ***age***
+
 ```{python}
-clarity_ranking = ["Product Manager", "Software Engineer", "Software Engineering Manager", "Data Scientist", "Solution Architect", "Technical Program Manager", "Human Resources", "Product Designer", "Marketing", "Business Analyst", "Hardware Engineer", "Sales", "Recruiter", "Mechanical Engineer", "Management Consultant"]
-
-titleboxplot = sns.boxplot(x="title", y="yearlysalary", color="b", order=clarity_ranking, data=df, showfliers = False, palette="Blues")
-titleboxplot.axes.set_title("Salary Box Plot by Job Title", fontsize=16)
-titleboxplot.set_xlabel("Job Title", fontsize=14)
-titleboxplot.set_ylabel("Yearly Salary", fontsize=14)
-plt.setp(titleboxplot.get_xticklabels(), rotation=90)
-
-plt.show()
-```
-
-
-ANOVA for title
-
-
-
-# 3. Does location impact the salaries of the employees? Y
-
-States in US
-Does location impact the salaries of the employees? 
-```{python}
-cate_loc = list(set(list(df['location'])))
-len(cate_loc) # 1050
-
+plt.plot(world1.age00, world1.income00, 'o')
+plt.ylabel("Income")
+plt.xlabel("world1 Age")
 ```
 
 ```{python}
-# Manoj
-plt.figure(figsize=(12,8))
-df["location"].value_counts().iloc[:10].plot(kind="bar", color="blue")
-plt.title("Top 10 Locations of Workers")
-plt.xlabel("Location", size=23)
-plt.ylabel("Count", size=23)
-plt.xticks(rotation='vertical')
-plt.show()
-```
-
-Comparing between US states
-Countries
-Comparing between coountires (US, Europe, India, etc..)
-
-# 4. Does work experience affect the salary of an employee? M
-```{python}
-sns.scatterplot(data=df,x = 'yearsofexperience',y ='yearlysalary')
-plt.title("YearosExperience vs Yearlysalary")
-plt.xticks(rotation='vertical')
+plt.plot(world2.age00, world2.income00, 'o')
+plt.ylabel("Income")
+plt.xlabel("world2 Age")
 ```
 
 ```{python}
-sns.barplot(data=df,x = 'yearsofexperience',y ='yearlysalary')
-plt.title("YearofExperience vs Yearlysalary")
-plt.xticks(rotation='vertical')
-plt.ylim(100000,1000000,50000)
-plt.xlim(0,60,5)
+plt.plot(world1.age00, world1.income00, 'o', alpha = 0.1, markersize = 3)
+plt.ylabel("Income")
+plt.xlabel("world1 Age")
 ```
 
 ```{python}
-sns.lineplot(data=df,x = 'yearsofexperience',y ='yearlysalary')
-plt.title("YearofExperience vs Yearlysalary")
-plt.xticks(rotation='vertical')
-plt.ylim(100000,1000000,50000)
-plt.xlim(0,60,5)
+plt.plot(world2.age00, world2.income00, 'o', alpha = 0.1, markersize = 3)
+plt.ylabel("Income")
+plt.xlabel("world2 Age")
 ```
 
-# 5. Is working for more years in the same company affect the salary? B
+There is income imbalance within each age group, however, it is not contingent upon less or more age. 
 
-Boxplot
-```{python}
-sns.boxplot(df['yearsatcompany']).set_title('Before removing outliers')
-```
-```{python}
-sns.boxplot(df2['yearsatcompany']).set_title('After removing outliers')
-
-```
-Scatterplot & Linear Regression Fit Line
-
-Before Removing Outliers
-```{python}
-sns.regplot(x=df["yearsatcompany"], y=df["yearlysalary"], line_kws={"color":"r","alpha":0.7,"lw":2}).set_title('Before removing outliers')
-plt.show()
-
-```
-After Removing Outliers
-```{python}
-sns.regplot(x=df2["yearsatcompany"], y=df2["yearlysalary"], line_kws={"color":"r","alpha":0.7,"lw":2}).set_title('After removing outliers')
-plt.show()
-
-```
-
-
-calculate the Pearson's correlation between two variables
-```{python}
-from scipy.stats import pearsonr
-corr, _ = pearsonr(df2['yearsatcompany'], df2['yearlysalary'])
-print('Pearsons correlation: %.3f' % corr)
-```
-Correlation matrix
-```{python}
-corr_matrix = df2.corr()
-print(corr_matrix)
-```
-
-# 6. Over time, the salary increase or decrease
+## **income** distribution by **education**
 
 ```{python}
-sns.countplot(data=df,x = 'timestamp')
-plt.title("Time Stamp")
+plt.plot(world1.education, world1.income00, 'o')
+plt.ylabel("Income")
+plt.xlabel("world1 Education")
 ```
+
+```{python}
+plt.plot(world2.education, world2.income00, 'o')
+plt.ylabel("ncome")
+plt.xlabel("world2 Education")
+```
+
+Although it is evenly distributed, those who have received an education of 12-year or more and 18-year or less certainly receive high income. In general, a total 12-year education period means basic education including high school education. I need to take a closer look but I guess people who receive undergraduate and graduate education earn a high income. 
+
+What is notable is that the education period over 6 years except the basic education period does not necessarily guarantee a higher income. 
+
+## **income** distribution by **marital**
+
+```{python}
+w1_marital0 = world1 [ world1['marital']== '0']
+w1_marital1 = world1 [ world1['marital']== '1']
+w1_marital2 = world1 [ world1['marital']== '2']
+w1_marital3 = world1 [ world1['marital']== '3']
+
+fig, ax = plt.subplots()
+data = [ w1_marital0['income00'], w1_marital1['income00'], w1_marital2['income00'], w1_marital3['income00'] ]
+plt.boxplot(data)
+plt.xticks([1,2,3,4], ['Never Married', 'Married', 'Divorced', 'Widowed'])
+plt.xlabel ('world1 Marital')
+plt.ylabel ('Income')
+```
+
+```{python}
+w2_marital0 = world2 [ world2['marital']== '0']
+w2_marital1 = world2 [ world2['marital']== '1']
+w2_marital2 = world2 [ world2['marital']== '2']
+w2_marital3 = world2 [ world2['marital']== '3']
+
+fig, ax = plt.subplots()
+data = [ w2_marital0['income00'], w2_marital1['income00'], w2_marital2['income00'], w2_marital3['income00'] ]
+plt.boxplot(data)
+plt.xticks([1,2,3,4], ['Never Married', 'Married', 'Divorced', 'Widowed'])
+plt.xlabel ('world2 Marital')
+plt.ylabel ('Income')
+```
+
+In both world, there is no big difference in income by marital.
+
+## **income** distribution by **gender**
+
+```{python}
+w1_gender0 = world1 [ world1['gender']== '0']
+w1_gender1 = world1 [ world1['gender']== '1']
+
+
+fig, ax = plt.subplots()
+data = [ w1_gender0['income00'], w1_gender1['income00'] ]
+plt.boxplot(data)
+plt.xticks([1,2], ['Female', 'Male'])
+plt.xlabel ('world1 Gender')
+plt.ylabel ('Income')
+```
+
+```{python}
+w2_gender0 = world2 [ world2['gender']== '0']
+w2_gender1 = world2 [ world2['gender']== '1']
+
+
+fig, ax = plt.subplots()
+data = [ w2_gender0['income00'], w2_gender1['income00'] ]
+plt.boxplot(data)
+plt.xticks([1,2], ['Female', 'Male'])
+plt.xlabel ('world2 Gender')
+plt.ylabel ('Income')
+```
+
+In world1, the mean for male is higher than female. In addition, maximum income for male is higher than female. 
+
+Otherwise, in world2, there is no difference in income by gender.
+
+## **income** distribution by **ethnic**
+
+```{python}
+w1_ethnic0 = world1 [ world1['ethnic']== '0']
+w1_ethnic1 = world1 [ world1['ethnic']== '1']
+w1_ethnic2 = world1 [ world1['ethnic']== '2']
+
+fig, ax = plt.subplots()
+data = [ w1_ethnic0['income00'], w1_ethnic1['income00'], w1_ethnic2['income00'] ]
+plt.boxplot(data)
+plt.xticks([1,2,3], ['Ethnic0', 'Ethnic1', 'Ethnic2'])
+plt.xlabel ('world1 Ethnic')
+plt.ylabel ('Income')
+```
+
+```{python}
+w2_ethnic0 = world2 [ world2['ethnic']== '0']
+w2_ethnic1 = world2 [ world2['ethnic']== '1']
+w2_ethnic2 = world2 [ world2['ethnic']== '2']
+
+fig, ax = plt.subplots()
+data = [ w2_ethnic0['income00'], w2_ethnic1['income00'], w2_ethnic2['income00'] ]
+plt.boxplot(data)
+plt.xticks([1,2,3], ['Ethnic0', 'Ethnic1', 'Ethnic2'])
+plt.xlabel ('world2 Ethnic')
+plt.ylabel ('Income')
+```
+
+In world1, there seems to be an apparent difference in income by ethnic. Ethnic2 has the largest maximum income compared to other ethnics, and everyone ranges from minimum to maximum income. Above all, the average income is higher than others. 
+
+Otherwise, in world2, there is no difference in income by ethnic as well as *marital* and *gender*.
+
+## **income** distribution by **industry**
+
+```{python}
+w1_industry0 = world1 [ world1['industry']== '0']
+w1_industry1 = world1 [ world1['industry']== '1']
+w1_industry2 = world1 [ world1['industry']== '2']
+w1_industry3 = world1 [ world1['industry']== '3']
+w1_industry4 = world1 [ world1['industry']== '4']
+w1_industry5 = world1 [ world1['industry']== '5']
+w1_industry6 = world1 [ world1['industry']== '6']
+w1_industry7 = world1 [ world1['industry']== '7']
+
+fig, ax = plt.subplots()
+data = [ w1_industry0['income00'], w1_industry1['income00'], w1_industry2['income00'], w1_industry3['income00'], w1_industry4['income00'], w1_industry5['income00'], w1_industry6['income00'], w1_industry7['income00'] ]
+plt.boxplot(data)
+plt.xticks([1,2,3,4,5,6,7,8], ['industry0', 'industry1', 'industry2', 'industry3', 'industry4', 'industry5', 'industry6', 'industry7'])
+plt.xlabel ('world1 Industry')
+plt.ylabel ('Income')
+```
+
+```{python}
+w2_industry0 = world2 [ world2['industry']== '0']
+w2_industry1 = world2 [ world2['industry']== '1']
+w2_industry2 = world2 [ world2['industry']== '2']
+w2_industry3 = world2 [ world2['industry']== '3']
+w2_industry4 = world2 [ world2['industry']== '4']
+w2_industry5 = world2 [ world2['industry']== '5']
+w2_industry6 = world2 [ world2['industry']== '6']
+w2_industry7 = world2 [ world2['industry']== '7']
+
+fig, ax = plt.subplots()
+data = [ w2_industry0['income00'], w2_industry1['income00'], w2_industry2['income00'], w2_industry3['income00'], w2_industry4['income00'], w2_industry5['income00'], w2_industry6['income00'], w2_industry7['income00'] ]
+plt.boxplot(data)
+plt.xticks([1,2,3,4,5,6,7,8], ['industry0', 'industry1', 'industry2', 'industry3', 'industry4', 'industry5', 'industry6', 'industry7'])
+
+plt.xlabel ('world2 Industry')
+plt.ylabel ('Income')
+```
+
+As for industry for two worlds, it has apparent income differences between industries. Also, it looks like a similar income system in both worlds. 
 
 # Conclusion
 
+The utopia I defined is a world in which individual freedom and effort are recognized regardless of demographic characteristics. Based on this, in particualr, I tried to observe the differences in income by age, marital status, gender, and ethnicity. 
+
+In world1, there was no difference in age itself, but there was a deviation within each age group. In marital, no special characteristics were distinguished. Gender variables clearly showed that females earn less than males, and when it comes to ethnic, ethnic2 often earn higher incomes than other ethnics. According to these features that there is difference on gender and ethnic, world1 was not close to the utopia I defined.
+
+On the other hand, in world2, age and marriage showed the same form in World 1. However, unlike world1, there was no noticeable difference in gender and ethnic variables. It was more of a utopia I defined. 
+
+Fragmentary visualizations such as plots cannot explain both minor differences and social phenomena, but with this analysis, regardless of demographic characteristics, income inequality did not appear in world2 than in world1.

@@ -44,7 +44,7 @@ old_df=pd.read_csv('Levels_Fyi_Salary_Data.csv')
 print(old_df.info())
 old_df.head()
 
-df = old_df[['timestamp','company','title','location','yearsofexperience','yearsatcompany']].copy()
+df = old_df[['timestamp','company','title','location','yearsofexperience','yearsatcompany', 'totalyearlycompensation']].copy()
 
 df['yearlysalary'] = old_df['totalyearlycompensation'] + old_df['basesalary']
 
@@ -54,10 +54,13 @@ df.to_csv('salary_data', index=False)
 ```
 
 ```{python}
-#| output: false
-df.info()
-df.head()
-df.describe()
+print (df.info())
+print (df.head())
+print (df.describe())
+print (df.isnull().sum())
+
+df = df.dropna()
+print (df.isnull().sum())
 ```
 
 
@@ -137,21 +140,14 @@ M= 320757.462; t= 23.245, p < 0.05
 # 2. Is salary affected by the role offered? 
 
 ```{python}
-df = pd.read_csv("salary_data")
-print (df.info())
-print (df.isnull().sum())
 print (df.head())
+
+print (pd.unique(df.title))
 print (df['title'].nunique())
 ```
 
-# %%
-# Is salary affected by the role offered? 
 
 ```{python}
-cate_title = list(set(list(df['title'])))
-# ['Management Consultant', 'Marketing', 'Product Designer', 'Human Resources', 'Product Manager', 'Software Engineering Manager', 'Solution Architect', 'Business Analyst', 'Sales', 'Hardware Engineer', 'Mechanical Engineer', 'Recruiter', 'Data Scientist' 'Technical Program Manager', 'Software Engineer']
-len(cate_title) # 15
-
 print (df['title'].value_counts())
 fig = px.pie(df, names = 'title', title = 'Title')
 fig.show()
@@ -160,30 +156,13 @@ fig.show()
 Avg salary by title
 ```{python}
 
-avgsalary = avgsalary = df.groupby('title').mean()['yearlysalary'].reset_index()
+avgsalary = df.groupby('title').mean()['yearlysalary'].reset_index()
 print (avgsalary)
 
-
-avgsalary.plot(kind = 'bar', x = 'title', y = 'yearlysalary', title = 'Average Salary per Job Title', figsize=(15,8))
+avgsalary.plot(kind = 'bar', x = 'title', y = 'yearlysalary', title = 'Average Salary by Job Title', figsize=(15,8))
 plt.show()
 
-```
 
-```{python}
-# plt.boxplot(df['title'])
-```
-
-```{python}
-# sns.set(style="whitegrid")
-
-# df = sns.load_dataset("df")
-# print(df.head())
-# print(df.tail())
-# print(df.info())
-# print(df.shape)
-```
-
-```{python}
 clarity_ranking = ["Product Manager", "Software Engineer", "Software Engineering Manager", "Data Scientist", "Solution Architect", "Technical Program Manager", "Human Resources", "Product Designer", "Marketing", "Business Analyst", "Hardware Engineer", "Sales", "Recruiter", "Mechanical Engineer", "Management Consultant"]
 
 titleboxplot = sns.boxplot(x="title", y="yearlysalary", color="b", order=clarity_ranking, data=df, showfliers = False, palette="Blues")
@@ -193,8 +172,9 @@ titleboxplot.set_ylabel("Yearly Salary", fontsize=14)
 plt.setp(titleboxplot.get_xticklabels(), rotation=90)
 
 plt.show()
-```
 
+
+```
 
 ANOVA for title
 

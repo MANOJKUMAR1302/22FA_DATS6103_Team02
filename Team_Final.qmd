@@ -1,0 +1,277 @@
+---
+title: "6103 Team"
+author: Brooklyn Chen, Manojkumar Yerraguntla, Nayaeun Kwon
+format:
+    html:    
+        code-fold: true
+        number-sections: true
+        toc: true
+        toc-depth: 6
+        toc-float: true
+        toc-location: left
+execute: 
+  result: hide
+  warning: false
+---
+
+```{python}
+#| output: false
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import rfit 
+import plotly.express as px
+import plotly.express as px
+import scipy.stats as stats
+import sklearn
+from sklearn.datasets import load_boston 
+import researchpy as rp
+from scipy.stats import pearsonr
+
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.width', 1000)
+pd.set_option('display.colheader_justify', 'center')
+pd.set_option('display.precision', 3)
+```
+
+```{python}
+#| output: false
+
+# Setting Dataset
+old_df=pd.read_csv('Levels_Fyi_Salary_Data.csv')
+print(old_df.info())
+old_df.head()
+
+df = old_df[['timestamp','company','title','location','yearsofexperience','yearsatcompany', 'totalyearlycompensation']].copy()
+
+df['yearlysalary'] = old_df['totalyearlycompensation'] + old_df['basesalary']
+
+df['timestamp'] = pd.to_datetime(df['timestamp']).dt.strftime('%Y')
+
+df.to_csv('salary_data', index=False)
+```
+
+```{python}
+print (df.info())
+print (df.head())
+print (df.describe())
+print (df.isnull().sum())
+
+df = df.dropna()
+print (df.isnull().sum())
+```
+
+
+# 1. Will the salary be affected by different employers? B 
+
+List all the companys in this dataframe
+```{python}
+print(f"the unique values:\n{pd.unique(df.company)}")
+```
+
+Removing the Outliers of yearlysalary
+
+```{python}
+df1 = df.copy()
+print ("Shape Of The Before Ouliers: ",df.shape)
+n=1.5
+IQR_1 = np.percentile(df1['yearlysalary'],75) - np.percentile(df1['yearlysalary'],25)
+#outlier = Q3 + n*IQR 8
+df1=df1[df1['yearlysalary'] < np.percentile(df1['yearlysalary'],75)+n*IQR_1]
+#outlier = Q1 - n*IQR 
+df1=df1[df1['yearlysalary'] > np.percentile(df1['yearlysalary'],25)-n*IQR_1]
+print ("Shape Of The After Ouliers: ",df1.shape)
+```
+
+Removing the Outliers of yearsatcompany
+```{python}
+df2 = df1.copy()
+print ("Shape Of The Before Ouliers: ",df.shape)
+n=1.5
+IQR_2 = np.percentile(df2['yearsatcompany'],75) - np.percentile(df2['yearsatcompany'],25)
+#outlier = Q3 + n*IQR 
+df2=df2[df2['yearsatcompany'] < np.percentile(df2['yearsatcompany'],75)+n*IQR_2]
+#outlier = Q1 - n*IQR 
+df2=df2[df2['yearsatcompany'] > np.percentile(df2['yearsatcompany'],25)-n*IQR_2]
+print ("Shape Of The After Ouliers: ",df2.shape)
+
+```
+
+Boxplot
+```{python}
+sns.boxplot(df['yearlysalary']).set_title('Before removing outliers')
+```
+
+```{python}
+sns.boxplot(df2['yearlysalary']).set_title('After removing outliers')
+```
+
+
+Independent-Sample T Test (2 groups)
+
+Top 10 companies in the United States (https://fortune.com/fortune500/)
+
+H0: The means for the two populations are equal.
+H1: The means for the two populations are not equal.
+
+```{python}
+top10 = df2[df2.company.isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil"
+"McKesson"])]
+rfit.dfchk(top10)
+```
+
+```{python}
+not10 = df2[~df2.company.isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil"
+"McKesson"])]
+rfit.dfchk(not10)
+
+summary, results = rp.ttest(group1= top10['yearlysalary'], group1_name= "top10",
+                            group2= not10['yearlysalary'], group2_name= "not10")
+
+print(summary)
+print(results)
+
+```
+The average yearlysalary for top 10 company, M= 10345.0 , was statistically signigicantly higher than those not-top-10 companies.
+M= 320757.462; t= 23.245, p < 0.05
+
+# 2. Is salary affected by the role offered? 
+
+```{python}
+print (df.head())
+
+print (pd.unique(df.title))
+print (df['title'].nunique())
+```
+
+
+```{python}
+print (df['title'].value_counts())
+fig = px.pie(df, names = 'title', title = 'Title')
+fig.show()
+```
+
+Avg salary by title
+```{python}
+
+avgsalary = df.groupby('title').mean()['yearlysalary'].reset_index()
+print (avgsalary)
+
+avgsalary.plot(kind = 'bar', x = 'title', y = 'yearlysalary', title = 'Average Salary by Job Title', figsize=(15,8))
+plt.show()
+
+
+clarity_ranking = ["Product Manager", "Software Engineer", "Software Engineering Manager", "Data Scientist", "Solution Architect", "Technical Program Manager", "Human Resources", "Product Designer", "Marketing", "Business Analyst", "Hardware Engineer", "Sales", "Recruiter", "Mechanical Engineer", "Management Consultant"]
+
+titleboxplot = sns.boxplot(x="title", y="yearlysalary", color="b", order=clarity_ranking, data=df, showfliers = False, palette="Blues")
+titleboxplot.axes.set_title("Salary Box Plot by Job Title", fontsize=16)
+titleboxplot.set_xlabel("Job Title", fontsize=14)
+titleboxplot.set_ylabel("Yearly Salary", fontsize=14)
+plt.setp(titleboxplot.get_xticklabels(), rotation=90)
+
+plt.show()
+
+
+```
+
+ANOVA for title
+
+
+
+# 3. Does location impact the salaries of the employees? Y
+
+States in US
+Does location impact the salaries of the employees? 
+```{python}
+cate_loc = list(set(list(df['location'])))
+len(cate_loc) # 1050
+
+```
+
+```{python}
+# Manoj
+plt.figure(figsize=(12,8))
+df["location"].value_counts().iloc[:10].plot(kind="bar", color="blue")
+plt.title("Top 10 Locations of Workers")
+plt.xlabel("Location", size=23)
+plt.ylabel("Count", size=23)
+plt.xticks(rotation='vertical')
+plt.show()
+```
+
+Comparing between US states
+Countries
+Comparing between coountires (US, Europe, India, etc..)
+
+# 4. Does work experience affect the salary of an employee? M
+```{python}
+sns.scatterplot(data=df,x = 'yearsofexperience',y ='yearlysalary')
+plt.title("YearosExperience vs Yearlysalary")
+plt.xticks(rotation='vertical')
+```
+
+```{python}
+sns.barplot(data=df,x = 'yearsofexperience',y ='yearlysalary')
+plt.title("YearofExperience vs Yearlysalary")
+plt.xticks(rotation='vertical')
+plt.ylim(100000,1000000,50000)
+plt.xlim(0,60,5)
+```
+
+```{python}
+sns.lineplot(data=df,x = 'yearsofexperience',y ='yearlysalary')
+plt.title("YearofExperience vs Yearlysalary")
+plt.xticks(rotation='vertical')
+plt.ylim(100000,1000000,50000)
+plt.xlim(0,60,5)
+```
+
+# 5. Is working for more years in the same company affect the salary? B
+
+Boxplot
+```{python}
+sns.boxplot(df['yearsatcompany']).set_title('Before removing outliers')
+```
+```{python}
+sns.boxplot(df2['yearsatcompany']).set_title('After removing outliers')
+
+```
+Scatterplot & Linear Regression Fit Line
+
+Before Removing Outliers
+```{python}
+sns.regplot(x=df["yearsatcompany"], y=df["yearlysalary"], line_kws={"color":"r","alpha":0.7,"lw":2}).set_title('Before removing outliers')
+plt.show()
+
+```
+After Removing Outliers
+```{python}
+sns.regplot(x=df2["yearsatcompany"], y=df2["yearlysalary"], line_kws={"color":"r","alpha":0.7,"lw":2}).set_title('After removing outliers')
+plt.show()
+
+```
+
+
+calculate the Pearson's correlation between two variables
+```{python}
+from scipy.stats import pearsonr
+corr, _ = pearsonr(df2['yearsatcompany'], df2['yearlysalary'])
+print('Pearsons correlation: %.3f' % corr)
+```
+Correlation matrix
+```{python}
+corr_matrix = df2.corr()
+print(corr_matrix)
+```
+
+# 6. Over time, the salary increase or decrease
+
+```{python}
+sns.countplot(data=df,x = 'timestamp')
+plt.title("Time Stamp")
+```
+
+# Conclusion
+

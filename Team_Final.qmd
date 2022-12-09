@@ -82,7 +82,7 @@ Race
 Education
 
 
-# 1. Is there a significant difference between the yearly salary in top 10 companies and the yearly salary in not-top-10 companies? B 
+# 1. Is there a significant difference between the yearly salary in top 10 companies and the yearly salary in not-top-10 companies? B Done
 
 List all the companys in this dataframe
 ```{python}
@@ -168,7 +168,7 @@ df3['topcompany']=np.where((df3['company'].isin(["Apple","apple","APPLE","Walmar
 ```
 The average yearlysalary for top 10 company, M= 355205.521 , was statistically signigicantly higher than those not-top-10 companies(M= 320767.298); t= 23.239, p < 0.05
 
-# 2. How much the highest earner by job title for each year?
+# 2. How much the highest earner by job title for each year? Y
 
 ```{python}
 print (df3.head())
@@ -211,7 +211,7 @@ ANOVA for title
 
 
 
-# 3. Does location impact the salaries of the employees? Y
+# 3. Does location impact the salaries of the employees? M will ask to his friend
 
 States in US
 Does location impact the salaries of the employees? 
@@ -236,7 +236,7 @@ Comparing between US states
 Countries
 Comparing between coountires (US, Europe, India, etc..)
 
-# 4. Does work experience affect the salary of an employee? M
+# 4. Does work experience affect the salary of an employee? M will ask to his friend
 ```{python}
 sns.scatterplot(data=df3,x = 'yearsofexperience',y ='yearlysalary')
 plt.title("Yearly Salary vs Year of Experience")
@@ -259,7 +259,7 @@ plt.ylim(100000,1000000,50000)
 plt.xlim(0,43,5)
 ```
 
-# 5. Is working for more years in the same company affect the salary? B
+# 5. Is working for more years in the same company affect the salary? B Done
 
 Boxplot
 ```{python}
@@ -292,7 +292,7 @@ corr, _ = pearsonr(df3['yearsatcompany'], df3['yearlysalary'])
 print('Pearsons correlation: %.3f' % corr)
 ```
 
-# 6. In the recent five years, the average salary keeps the same?
+# 6. In the recent five years, the average salary keeps the same? B Done
 
 ```{python}
 # Boxplot: yearlysalary vs timestamp

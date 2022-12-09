@@ -48,7 +48,6 @@ old_df=pd.read_csv('Levels_Fyi_Salary_Data.csv')
 # Explore Dataset
 old_dfprofile = pp.ProfileReport(old_df)
 old_dfprofile
-
 ```
 ```{python}
 # Preprocessing Dataset
@@ -262,6 +261,7 @@ Boxplot
 ```{python}
 sns.boxplot(df['yearsatcompany']).set_title('Before removing outliers')
 ```
+
 ```{python}
 sns.boxplot(df2['yearsatcompany']).set_title('After removing outliers')
 

@@ -22,12 +22,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import rfit 
 import plotly.express as px
-import plotly.express as px
 import scipy.stats as stats
 import sklearn
 from sklearn.datasets import load_boston 
 import researchpy as rp
 from scipy.stats import pearsonr
+import missingno as msno
+import pandas_profiling as pp
 
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
@@ -53,15 +54,57 @@ df['timestamp'] = pd.to_datetime(df['timestamp']).dt.strftime('%Y')
 df.to_csv('salary_data', index=False)
 ```
 
+# Dataset
 ```{python}
-print (df.info())
-print (df.head())
-print (df.describe())
-print (df.isnull().sum())
+#| output: false
 
-df = df.dropna()
-print (df.isnull().sum())
+# Setting Dataset
+old_df=pd.read_csv('Levels_Fyi_Salary_Data.csv')
+
+# Explore Dataset
+old_dfprofile = pp.ProfileReport(old_df)
+old_dfprofile
 ```
+```{python}
+# Preprocessing Dataset
+df = old_df[['timestamp','company','title','location','yearsofexperience','yearsatcompany', 'gender', 'Masters_Degree', 'Bachelors_Degree', 'Doctorate_Degree', 'Highschool', 'Some_College', 'Race_Asian', 'Race_White', 'Race_Two_Or_More', 'Race_Black', 'Race_Hispanic', 'basesalary', 'stockgrantvalue', 'bonus', 'totalyearlycompensation']]
+df['timestamp'] = pd.to_datetime(df['timestamp']).dt.strftime('%Y')
+```
+```{python}
+# Check new dataset
+dfprofile = pp.ProfileReport(df)
+dfprofile
+```
+Total 30 variables.
+
+timestamp: When the data was recorded
+company: Company name
+title: Jop title
+* totalyearlycompensation: Total yearly earning
+location: Job location
+yearsofexperience: Year of Experience
+yearsatcompany: Years of experience at said company
+gender: 
+Master_Degree: Dummy variables, 1 or 0
+Bachelors_Degree: Dummy variables, 1 or 0
+Highschool: Dummy variables, 1 or 0
+Some_College: Dummy variables, 1 or 0
+Race_Asian: Dummy variables, 1 or 0
+Race_White: Dummy variables, 1 or 0
+Race_Two_Or_More: Dummy variables, 1 or 0
+Race_Black: Dummy variables, 1 or 0
+Race_Hispanic: Dummy variables, 1 or 0
+
+Remove following variables:
+level: What level the observation is at
+otherdetails:
+tag
+basesalary, stockgrantvalue, bonus is combined into total eyarlycompensation. 
+cityid
+dmaid
+rowNumber
+Race
+Education
 
 
 # 1. Is there a significant difference between the yearly salary in top 10 companies and the yearly salary in not-top-10 companies? B 
@@ -134,7 +177,7 @@ print(results)
 df2['topcompany']=np.where((df2['company'].isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil", "McKesson"])) & (~df2['company'].isin([120,128])),1,0)
 
 ```
-# The average yearlysalary for top 10 company, M= 355205.521 , was statistically signigicantly higher than those not-top-10 companies(M= 320767.298); t= 23.239, p < 0.05
+The average yearlysalary for top 10 company, M= 355205.521 , was statistically signigicantly higher than those not-top-10 companies(M= 320767.298); t= 23.239, p < 0.05
 
 # 2. Is salary affected by the role offered? 
 

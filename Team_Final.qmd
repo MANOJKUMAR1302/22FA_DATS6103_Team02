@@ -27,7 +27,6 @@ import sklearn
 from sklearn.datasets import load_boston 
 import researchpy as rp
 from scipy.stats import pearsonr
-import missingno as msno
 import pandas_profiling as pp
 
 pd.set_option('display.max_rows', None)
@@ -118,13 +117,27 @@ print ("Shape Of The After Ouliers: ",df2.shape)
 
 ```
 
+Removing the Outliers of yearsofexperience
+```{python}
+df3 = df2.copy()
+print ("Shape Of The Before Ouliers: ",df.shape)
+n=1.5
+IQR_3 = np.percentile(df3['yearsofexperience'],75) - np.percentile(df3['yearsofexperience'],25)
+#outlier = Q3 + n*IQR 
+df3=df3[df3['yearsofexperience'] < np.percentile(df3['yearsofexperience'],75)+n*IQR_3]
+#outlier = Q1 - n*IQR 
+df3=df3[df3['yearsofexperience'] > np.percentile(df3['yearsofexperience'],25)-n*IQR_3]
+print ("Shape Of The After Ouliers: ",df3.shape)
+
+```
+
 Boxplot
 ```{python}
 sns.boxplot(df['yearlysalary'], orient="h").set_title('Yearly Salary -  before removing outliers')
 ```
 
 ```{python}
-sns.boxplot(df2['yearlysalary'], orient="h").set_title('Yearly Salary - after removing outliers')
+sns.boxplot(df3['yearlysalary'], orient="h").set_title('Yearly Salary - after removing outliers')
 ```
 
 
@@ -136,10 +149,10 @@ H0: The means for the two populations are equal.
 H1: The means for the two populations are not equal.
 
 ```{python}
-top10 = df2[df2.company.isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil"
+top10 = df3[df3.company.isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil"
 "McKesson"])]
 
-not10 = df2[~df2.company.isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil"
+not10 = df3[~df3.company.isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil"
 "McKesson"])]
 ```
 
@@ -150,7 +163,7 @@ summary, results = rp.ttest(group1= top10['yearlysalary'], group1_name= "top10",
 print(summary)
 print(results)
 
-df2['topcompany']=np.where((df2['company'].isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil", "McKesson"])) & (~df2['company'].isin([120,128])),1,0)
+df3['topcompany']=np.where((df3['company'].isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil", "McKesson"])) & (~df3['company'].isin([120,128])),1,0)
 
 ```
 The average yearlysalary for top 10 company, M= 355205.521 , was statistically signigicantly higher than those not-top-10 companies(M= 320767.298); t= 23.239, p < 0.05
@@ -158,23 +171,23 @@ The average yearlysalary for top 10 company, M= 355205.521 , was statistically s
 # 2. How much the highest earner by job title for each year?
 
 ```{python}
-print (df2.head())
+print (df3.head())
 
-print (pd.unique(df2.title))
-print (df2['title'].nunique())
+print (pd.unique(df3.title))
+print (df3['title'].nunique())
 ```
 
 
 ```{python}
-print (df2['title'].value_counts())
-fig = px.pie(df2, names = 'title', title = 'Title')
+print (df3['title'].value_counts())
+fig = px.pie(df3, names = 'title', title = 'Title')
 fig.show()
 ```
 
 Avg salary by title
 ```{python}
 
-avgsalary = df2.groupby('title').mean()['yearlysalary'].reset_index()
+avgsalary = df3.groupby('title').mean()['yearlysalary'].reset_index()
 print (avgsalary)
 
 avgsalary.plot(kind = 'bar', x = 'title', y = 'yearlysalary', title = 'Average Salary by Job Title', figsize=(15,8))
@@ -183,7 +196,7 @@ plt.show()
 
 clarity_ranking = ["Product Manager", "Software Engineer", "Software Engineering Manager", "Data Scientist", "Solution Architect", "Technical Program Manager", "Human Resources", "Product Designer", "Marketing", "Business Analyst", "Hardware Engineer", "Sales", "Recruiter", "Mechanical Engineer", "Management Consultant"]
 
-titleboxplot = sns.boxplot(x="title", y="yearlysalary", color="b", order=clarity_ranking, data=df2, showfliers = False, palette="Blues")
+titleboxplot = sns.boxplot(x="title", y="yearlysalary", color="b", order=clarity_ranking, data=df3, showfliers = False, palette="Blues")
 titleboxplot.axes.set_title("Salary Box Plot by Job Title", fontsize=16)
 titleboxplot.set_xlabel("Job Title", fontsize=14)
 titleboxplot.set_ylabel("Yearly Salary", fontsize=14)
@@ -211,7 +224,7 @@ len(cate_loc) # 1050
 ```{python}
 # Manoj
 plt.figure(figsize=(12,8))
-df2["location"].value_counts().iloc[:10].plot(kind="bar", color="blue")
+df3["location"].value_counts().iloc[:10].plot(kind="bar", color="blue")
 plt.title("Top 10 Locations of Workers")
 plt.xlabel("Location", size=23)
 plt.ylabel("Count", size=23)
@@ -225,13 +238,13 @@ Comparing between coountires (US, Europe, India, etc..)
 
 # 4. Does work experience affect the salary of an employee? M
 ```{python}
-sns.scatterplot(data=df2,x = 'yearsofexperience',y ='yearlysalary')
+sns.scatterplot(data=df3,x = 'yearsofexperience',y ='yearlysalary')
 plt.title("Yearly Salary vs Year of Experience")
 plt.xticks(rotation='vertical')
 ```
 
 ```{python}
-sns.barplot(data=df2,x = 'yearsofexperience',y ='yearlysalary')
+sns.barplot(data=df3,x = 'yearsofexperience',y ='yearlysalary')
 plt.title("Yearly Salary vs Year of Experience")
 plt.xticks(rotation='vertical')
 plt.ylim(100000,650000,100000)
@@ -239,7 +252,7 @@ plt.xlim(0,60,5)
 ```
 
 ```{python}
-sns.lineplot(data=df2,x = 'yearsofexperience',y ='yearlysalary')
+sns.lineplot(data=df3,x = 'yearsofexperience',y ='yearlysalary')
 plt.title("Yearly Salary vs Year of Experience")
 plt.xticks(rotation='vertical')
 plt.ylim(100000,1000000,50000)
@@ -254,7 +267,7 @@ sns.boxplot(df['yearsatcompany']).set_title('Years at Company - before removing 
 ```
 
 ```{python}
-sns.boxplot(df2['yearsatcompany']).set_title('Years at Company - after removing outliers')
+sns.boxplot(df3['yearsatcompany']).set_title('Years at Company - after removing outliers')
 
 ```
 Scatterplot & Linear Regression Fit Line
@@ -267,7 +280,7 @@ plt.show()
 ```
 After Removing Outliers
 ```{python}
-sns.regplot(x=df2["yearsatcompany"], y=df2["yearlysalary"], line_kws={"color":"r","alpha":0.7,"lw":2}).set_title('After removing outliers')
+sns.regplot(x=df3["yearsatcompany"], y=df3["yearlysalary"], line_kws={"color":"r","alpha":0.7,"lw":2}).set_title('After removing outliers')
 plt.show()
 
 ```
@@ -275,7 +288,7 @@ plt.show()
 calculate the Pearson's correlation between two variables
 ```{python}
 from scipy.stats import pearsonr
-corr, _ = pearsonr(df2['yearsatcompany'], df2['yearlysalary'])
+corr, _ = pearsonr(df3['yearsatcompany'], df3['yearlysalary'])
 print('Pearsons correlation: %.3f' % corr)
 ```
 
@@ -283,16 +296,16 @@ print('Pearsons correlation: %.3f' % corr)
 
 ```{python}
 # Boxplot: yearlysalary vs timestamp
-sns.boxplot(data=df2,x = 'timestamp', y = 'yearlysalary')
+sns.boxplot(data=df3,x = 'timestamp', y = 'yearlysalary')
 plt.title("Yearly Salary vs Year")
 plt.ylim(100000,750000,10000)
 ```
 
 ```{python}
 # Q-Q Plot (Normality Assumption Check)
-unique_time = df2['timestamp'].unique()
+unique_time = df3['timestamp'].unique()
 for timestamp in unique_time:
-    stats.probplot(df2[df2['timestamp'] == timestamp]['yearlysalary'], dist="norm", plot=plt)
+    stats.probplot(df3[df3['timestamp'] == timestamp]['yearlysalary'], dist="norm", plot=plt)
     plt.title("Probability Plot - " +  timestamp)
     plt.show()
 ```
@@ -311,12 +324,12 @@ anova_table = pd.DataFrame(data, columns = ['Source of Variation', 'SS', 'df', '
 anova_table.set_index('Source of Variation', inplace = True)
 
 # calculate SSTR and update anova table
-x_bar = df2['yearlysalary'].mean()
-SSTR = df2.groupby('timestamp').count() * (df2.groupby('timestamp').mean() - x_bar)**2
+x_bar = df3['yearlysalary'].mean()
+SSTR = df3.groupby('timestamp').count() * (df3.groupby('timestamp').mean() - x_bar)**2
 anova_table['SS']['Between Groups'] = SSTR['yearlysalary'].sum()
 
 # calculate SSE and update anova table
-SSE = (df2.groupby('timestamp').count() - 1) * df2.groupby('timestamp').std()**2
+SSE = (df3.groupby('timestamp').count() - 1) * df3.groupby('timestamp').std()**2
 anova_table['SS']['Within Groups'] = SSE['yearlysalary'].sum()
 
 # calculate SSTR and update anova table
@@ -324,9 +337,9 @@ SSTR = SSTR['yearlysalary'].sum() + SSE['yearlysalary'].sum()
 anova_table['SS']['Total'] = SSTR
 
 # update degree of freedom
-anova_table['df']['Between Groups'] = df2['timestamp'].nunique() - 1
-anova_table['df']['Within Groups'] = df2.shape[0] - df2['timestamp'].nunique()
-anova_table['df']['Total'] = df2.shape[0] - 1
+anova_table['df']['Between Groups'] = df3['timestamp'].nunique() - 1
+anova_table['df']['Within Groups'] = df3.shape[0] - df3['timestamp'].nunique()
+anova_table['df']['Total'] = df3.shape[0] - 1
 
 # calculate MS
 anova_table['MS'] = anova_table['SS'] / anova_table['df']
@@ -368,16 +381,20 @@ print(conclusion)
 
 Correlation matrix
 ```{python}
-corr_matrix = df2.corr()
+corr_matrix = df3.corr()
 print(corr_matrix)
+
+plt.figure(figsize=(12,10))
+sns.heatmap(corr_matrix, cmap=plt.cm.CMRmap_r,annot=True)
+plt.show() 
 ```
 
 ```{python}
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 
-X = df2.loc[:,['timestamp', 'yearsofexperience', 'yearsatcompany', 'totalyearlycompensation']]
-y = df2[['yearlysalary']]
+X = df3.loc[:,['timestamp', 'yearsofexperience', 'yearsatcompany', 'totalyearlycompensation']]
+y = df3[['yearlysalary']]
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 0)
 
@@ -414,12 +431,6 @@ old_df['Race'].isna().sum()
 ```
 
 
-
-# [Additional SMART Questions]
-
-# Highest earner by profession for each year?
-
-# Effect of experience level on salary?
 
 
 # Which title (role) in the not-top-10 companies should I look for if I want to earn my salary over 200K a year. (I have 3-year of work experience and want to find a job in NY)

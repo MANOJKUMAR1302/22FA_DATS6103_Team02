@@ -52,7 +52,14 @@ old_dfprofile
 df = old_df[['timestamp','company','title','location','yearsofexperience','yearsatcompany', 'gender']].dropna()
 df['yearlysalary'] = old_df['totalyearlycompensation']
 df['timestamp'] = pd.to_datetime(df['timestamp']).dt.strftime('%Y')
+
+# Removing outliers for normalization
+
+
 ```
+
+
+
 ```{python}
 # Check new dataset
 dfprofile = pp.ProfileReport(df)

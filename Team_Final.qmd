@@ -155,7 +155,7 @@ df2['topcompany']=np.where((df2['company'].isin(["Apple","apple","APPLE","Walmar
 ```
 The average yearlysalary for top 10 company, M= 355205.521 , was statistically signigicantly higher than those not-top-10 companies(M= 320767.298); t= 23.239, p < 0.05
 
-# 2. Is salary affected by the role offered? 
+# 2. How much the highest earner by job title for each year?
 
 ```{python}
 print (df2.head())

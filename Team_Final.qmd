@@ -115,7 +115,8 @@ df=df.dropna()
 
 ```{python}
 # Rehecking the number of null values
-df.isnull().sum()
+print (df.isnull().sum())
+print (df.shape)
 ```
 
 Removing the Outliers:
@@ -185,10 +186,6 @@ List all the companys in this dataframe
 ```{python}
 print(f"the unique values:\n{pd.unique(df.company)}")
 ```
-
-
-
-
 
 
 Boxplot

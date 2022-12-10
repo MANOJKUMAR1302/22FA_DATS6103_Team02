@@ -16,6 +16,7 @@ execute:
 
 ```{python}
 #| output: false
+#| Importing the Libraries
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -40,65 +41,87 @@ pd.set_option('display.precision', 3)
 ```{python}
 #| output: false
 
-# Setting Dataset
+# Important the Salary DataSet from .CSV file
 old_df=pd.read_csv('Levels_Fyi_Salary_Data.csv')
 
 # Explore Dataset
 old_dfprofile = pp.ProfileReport(old_df)
 old_dfprofile
 ```
+
 ```{python}
 # Preprocessing Dataset
-df = old_df[['timestamp','company','title','location','yearsofexperience','yearsatcompany', 'gender']].dropna()
+# Creating a new dataframe with selected Features
+df = old_df[['timestamp','company','title','location','yearsofexperience','yearsatcompany', 'gender']]
+
+# Renaming the Totalyearlycompensation variable name into yearlysalary
 df['yearlysalary'] = old_df['totalyearlycompensation']
+
+# Coverting timestamp feature from MM-DD-YYYY HH:MM:SS format to YYYY format
 df['timestamp'] = pd.to_datetime(df['timestamp']).dt.strftime('%Y')
 
-# Removing outliers for normalization
-
-
 ```
 
-
-
-```{python}
-# Check new dataset
-dfprofile = pp.ProfileReport(df)
-dfprofile
-```
-Total 30 variables.
+Out of 30 features we have considered the below features in our final Dataframe:
 
 timestamp: When the data was recorded
-company: Company name
-title: Jop title
-* totalyearlycompensation: Total yearly earning
-location: Job location
+company: Company name into which employee got selected
+title: Jop title of the employee
+yearlysalary: Amount of salary earned by the employee
+location: Job location 
 yearsofexperience: Year of Experience
-yearsatcompany: Years of experience at said company
-gender:
+yearsatcompany: Years of experience at same company
+gender: Male or Female
 
 
-Remove following variables:
-level: What level the observation is at
-otherdetails:
-tag
-basesalary, stockgrantvalue, bonus is combined into total eyarlycompensation. 
-cityid
-dmaid
-rowNumber
-Race
-Education
+Removed the following variables in our final Dataframe:
+level, otherdetails, tag, basesalary, stockgrantvalue, bonus, cityid, dmaid, rowNumber, Race, Education
 
-
-# 1. Is there a significant difference between the yearly salary in top 10 companies and the yearly salary in not-top-10 companies? B Done
-
-List all the companys in this dataframe
 ```{python}
-print(f"the unique values:\n{pd.unique(df.company)}")
+# Observing the Number of Rows of Number of Columns in the dataframe
+df.shape
 ```
 
-Removing the Outliers of yearlysalary
+```{python}
+# Printing the top five Rows of the dataframe
+df.head()
+```
+
 
 ```{python}
+# Descriptive Statistics Summary of the dataframe
+df.describe()
+```
+
+```{python}
+# checking for number of duplicates
+df.duplicated().sum()
+```
+
+```{python}
+# Removing the duplicates from the dataframe
+df.drop_duplicates(keep=False,inplace=True)
+```
+
+```{python}
+# Checking the number of null values 
+df.isnull().sum()
+```
+
+```{python}
+# Removing the null values
+df=df.dropna()
+```
+
+```{python}
+# Rehecking the number of null values
+df.isnull().sum()
+```
+
+Removing the Outliers:
+
+```{python}
+# Removing the Outliers on the basis of yearlysalary
 df1 = df.copy()
 print ("Shape Of The Before Ouliers: ",df.shape)
 n=1.5
@@ -110,8 +133,9 @@ df1=df1[df1['yearlysalary'] > np.percentile(df1['yearlysalary'],25)-n*IQR_1]
 print ("Shape Of The After Ouliers: ",df1.shape)
 ```
 
-Removing the Outliers of yearsatcompany
+
 ```{python}
+# Removing the Outliers on the basis of yearsatcompany
 df2 = df1.copy()
 print ("Shape Of The Before Ouliers: ",df.shape)
 n=1.5
@@ -121,11 +145,11 @@ df2=df2[df2['yearsatcompany'] < np.percentile(df2['yearsatcompany'],75)+n*IQR_2]
 #outlier = Q1 - n*IQR 
 df2=df2[df2['yearsatcompany'] > np.percentile(df2['yearsatcompany'],25)-n*IQR_2]
 print ("Shape Of The After Ouliers: ",df2.shape)
-
 ```
 
-Removing the Outliers of yearsofexperience
+
 ```{python}
+# Removing the Outliers on the basis of yearsofexperience
 df3 = df2.copy()
 print ("Shape Of The Before Ouliers: ",df.shape)
 n=1.5
@@ -137,6 +161,35 @@ df3=df3[df3['yearsofexperience'] > np.percentile(df3['yearsofexperience'],25)-n*
 print ("Shape Of The After Ouliers: ",df3.shape)
 
 ```
+
+```{python}
+# Recalculating the shape of dataframe after removing duplicates, null values, and Outliers
+df3.shape
+```
+
+```{python}
+# Observing the first five rows of the dataframe after removing duplicates, null values, and Outliers
+df3.head()
+```
+
+```{python}
+# Descriptive Statistics Summary of the dataframe after removing duplicates, null values, and Outliers
+df3.describe()
+```
+
+## Exploratory Data Analysis
+
+# 1. Is there a significant difference between the yearly salary in top 10 companies and the yearly salary in not-top-10 companies? B Done
+
+List all the companys in this dataframe
+```{python}
+print(f"the unique values:\n{pd.unique(df.company)}")
+```
+
+
+
+
+
 
 Boxplot
 ```{python}

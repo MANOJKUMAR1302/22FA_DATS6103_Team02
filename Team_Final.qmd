@@ -78,6 +78,11 @@ Removed the following variables in our final Dataframe:
 level, otherdetails, tag, basesalary, stockgrantvalue, bonus, cityid, dmaid, rowNumber, Race, Education
 
 ```{python}
+# Removing a row which has irrelavent value for feature Gender='Title: Senior Software Engineer'
+df=df.drop(labels=11010,axis=0)
+```
+
+```{python}
 # Observing the Number of Rows of Number of Columns in the dataframe
 df.shape
 ```
@@ -260,7 +265,13 @@ titleboxplot.set_ylabel("Yearly Salary", fontsize=14)
 plt.setp(titleboxplot.get_xticklabels(), rotation=90)
 
 plt.show()
+```
 
+```{python}
+sns.boxplot(data=df,x = 'title', y = 'yearlysalary')
+plt.title("Title vs Yearlysalary")
+plt.xticks(rotation='vertical')
+plt.ylim(0,500000,10000)
 
 ```
 
@@ -304,8 +315,8 @@ plt.xticks(rotation='vertical')
 sns.barplot(data=df3,x = 'yearsofexperience',y ='yearlysalary')
 plt.title("Yearly Salary vs Year of Experience")
 plt.xticks(rotation='vertical')
-plt.ylim(100000,650000,100000)
-plt.xlim(0,60,5)
+plt.ylim(0,400000,25000)
+plt.xlim(0,35,5)
 ```
 
 ```{python}
@@ -313,7 +324,7 @@ sns.lineplot(data=df3,x = 'yearsofexperience',y ='yearlysalary')
 plt.title("Yearly Salary vs Year of Experience")
 plt.xticks(rotation='vertical')
 plt.ylim(100000,1000000,50000)
-plt.xlim(0,43,5)
+plt.xlim(0,20,5)
 ```
 
 # 5. Is working for more years in the same company affect the salary? B Done
@@ -352,10 +363,21 @@ print('Pearsons correlation: %.3f' % corr)
 # 6. In the recent five years, the average salary keeps the same? B Done
 
 ```{python}
+sns.barplot(data=df,x = 'timestamp',y ='yearlysalary')
+plt.title("Timestamp vs Yearlysalary")
+plt.xticks(rotation='vertical')
+```
+
+```{python}
 # Boxplot: yearlysalary vs timestamp
 sns.boxplot(data=df3,x = 'timestamp', y = 'yearlysalary')
 plt.title("Yearly Salary vs Year")
 plt.ylim(100000,750000,10000)
+```
+
+```{python}
+sns.countplot(data=df,x = 'timestamp')
+plt.title("Time Stamp")
 ```
 
 ```{python}
@@ -430,6 +452,14 @@ print(conclusion)
 
 # Rejact H0
 
+```
+
+```{python}
+7. How large is the wage disparity between men and women?
+
+sns.boxplot(data=df3,x = 'gender', y = 'yearlysalary')
+plt.title("Gender vs Income")
+plt.ylim(0,500000,25000)
 ```
 
 

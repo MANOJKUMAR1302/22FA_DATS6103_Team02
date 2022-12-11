@@ -571,42 +571,40 @@ plt.ylim(0,500000,25000)
 
 ```{python}
 # H₀: Salary by gender are equal.
-# H₁: Year by year salary means of Hardware Engineer are not equal.
+# H₁: Salary by gender are not equal.
 # α = 0.05
 
-HE = df3[df3['title'] == 'Hardware Engineer']
-
-HE_ANOVA = [['Between Groups', '', '', '', '', '', ''], ['Within Groups', '', '', '', '', '', ''], ['Total', '', '', '', '', '', '']] 
-HE_anova_table = pd.DataFrame(HE_ANOVA, columns = ['Source of Variation', 'SS', 'df', 'MS', 'F', 'P-value', 'F crit']) 
-HE_anova_table.set_index('Source of Variation', inplace = True)
+gender_ANOVA = [['Between Groups', '', '', '', '', '', ''], ['Within Groups', '', '', '', '', '', ''], ['Total', '', '', '', '', '', '']] 
+gender_anova_table = pd.DataFrame(gender_ANOVA, columns = ['Source of Variation', 'SS', 'df', 'MS', 'F', 'P-value', 'F crit']) 
+gender_anova_table.set_index('Source of Variation', inplace = True)
 
 # calculate SSTR and update anova table
-x_bar = HE['yearlysalary'].mean()
-SSTR = HE.groupby('timestamp').count() * (HE.groupby('timestamp').mean() - x_bar)**2       
-HE_anova_table['SS']['Between Groups'] = SSTR['yearlysalary'].sum()
+x_bar = df3['yearlysalary'].mean()
+SSTR = df3.groupby('gender').count() * (df3.groupby('gender').mean() - x_bar)**2       
+gender_anova_table['SS']['Between Groups'] = SSTR['yearlysalary'].sum()
 
 # calculate SSE and update anova table
-SSE = (HE.groupby('timestamp').count() - 1) * HE.groupby('timestamp').std()**2
-HE_anova_table['SS']['Within Groups'] = SSE['yearlysalary'].sum()
+SSE = (df3.groupby('gender').count() - 1) * df3.groupby('gender').std()**2
+gender_anova_table['SS']['Within Groups'] = SSE['yearlysalary'].sum()
 
 # calculate SSTR and update anova table
 SSTR = SSTR['yearlysalary'].sum() + SSE['yearlysalary'].sum()
-HE_anova_table['SS']['Total'] = SSTR
+gender_anova_table['SS']['Total'] = SSTR
 
 # update degree of freedom
-HE_anova_table['df']['Between Groups'] = HE['timestamp'].nunique() - 1
-HE_anova_table['df']['Within Groups'] = HE.shape[0] - HE['timestamp'].nunique()
-HE_anova_table['df']['Total'] = HE.shape[0] - 1
+gender_anova_table['df']['Between Groups'] = df3['gender'].nunique() - 1
+gender_anova_table['df']['Within Groups'] = df3.shape[0] - df3['timestamp'].nunique()
+gender_anova_table['df']['Total'] = df3.shape[0] - 1
 
 # calculate MS
-HE_anova_table['MS'] = HE_anova_table['SS'] / HE_anova_table['df']
+gender_anova_table['MS'] = gender_anova_table['SS'] / gender_anova_table['df']
 
 # calculate F 
-F = HE_anova_table['MS']['Between Groups'] / HE_anova_table['MS']['Within Groups']
-HE_anova_table['F']['Between Groups'] = F
+F = gender_anova_table['MS']['Between Groups'] / gender_anova_table['MS']['Within Groups']
+gender_anova_table['F']['Between Groups'] = F
 
 # p-value
-HE_anova_table['P-value']['Between Groups'] = 1 - stats.f.cdf(F, HE_anova_table['df']['Between Groups'], HE_anova_table['df']['Within Groups'])
+gender_anova_table['P-value']['Between Groups'] = 1 - stats.f.cdf(F, gender_anova_table['df']['Between Groups'], gender_anova_table['df']['Within Groups'])
 
 # F critical 
 alpha = 0.05
@@ -614,24 +612,24 @@ alpha = 0.05
 tail_hypothesis_type = "two-tailed"
 if tail_hypothesis_type == "two-tailed":
     alpha /= 2
-HE_anova_table['F crit']['Between Groups'] = stats.f.ppf(1-alpha, HE_anova_table['df']['Between Groups'], HE_anova_table['df']['Within Groups'])
+gender_anova_table['F crit']['Between Groups'] = stats.f.ppf(1-alpha, gender_anova_table['df']['Between Groups'], gender_anova_table['df']['Within Groups'])
 
 # Final ANOVA Table
-HE_anova_table
+gender_anova_table
 ```
 ```{python}
 print("The p-value approach to hypothesis testing in the decision rule")
 conclusion = "Failed to reject the null hypothesis."
-if HE_anova_table['P-value']['Between Groups'] <= alpha:
+if gender_anova_table['P-value']['Between Groups'] <= alpha:
     conclusion = "Null Hypothesis is rejected."
-print("F-score is:", HE_anova_table['F']['Between Groups'], " and p value is:", HE_anova_table['P-value']['Between Groups'])    
+print("F-score is:", gender_anova_table['F']['Between Groups'], " and p value is:", gender_anova_table['P-value']['Between Groups'])    
 print(conclusion)
 
 # Reject H0
 ```                          
 
 
-# 3. Is there a significant difference between the yearly salary in top 10 companies and the yearly salary in not-top-10 companies? B Done
+# 3. Is there a significant difference between the yearly salary in top 10 companies and the yearly salary in not-top-10 companies?
 
 List all the companys in this dataframe
 ```{python}
@@ -673,7 +671,7 @@ df3['topcompany']=np.where((df3['company'].isin(["Apple","apple","APPLE","Walmar
 The average yearlysalary for top 10 company, M= 355205.521 , was statistically signigicantly higher than those not-top-10 companies(M= 320767.298); t= 23.239, p < 0.05
 
 
-# 4. Is working for more years in the same company affect the salary? B Done
+# 4. Is working for more years in the same company affect the salary? 
 
 Boxplot
 ```{python}
@@ -706,7 +704,7 @@ corr, _ = pearsonr(df3['yearsatcompany'], df3['yearlysalary'])
 print('Pearsons correlation: %.3f' % corr)
 ```
 
-# 5. In the recent five years, the average salary keeps the same? B Done
+# 5. In the recent five years, the average salary keeps the same?
 
 ```{python}
 sns.barplot(data=df,x = 'timestamp',y ='yearlysalary')

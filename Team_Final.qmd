@@ -52,7 +52,7 @@ old_dfprofile = pp.ProfileReport(old_df)
 ```{python}
 # Preprocessing Dataset
 # Creating a new dataframe with selected Features
-df = old_df[['timestamp','company','title','location','yearsofexperience','yearsatcompany', 'gender']]
+df = old_df[['timestamp','company','title','location','yearsofexperience','yearsatcompany']]
 
 # Renaming the Totalyearlycompensation variable name into yearlysalary
 df['yearlysalary'] = old_df['totalyearlycompensation']
@@ -602,34 +602,8 @@ print(conclusion)
 According to ANOVA for salary mean by job position over year, salary by title over time is statistically significant, which means 
 
 
-# 3. Does location impact the salaries of the employees? M will ask to his friend
+# 3. Does work experience affect the salary of an employee? M will ask to his friend
 
-```{python}
-cate_loc = list(set(list(df['location'])))
-len(cate_loc) # 1050
-
-```
-
-```{python}
-# Manoj
-plt.figure(figsize=(12,8))
-df3["location"].value_counts().iloc[:10].plot(kind="bar", color="blue")
-plt.title("Top 10 Locations of Workers")
-plt.xlabel("Location", size=23)
-plt.ylabel("Count", size=23)
-plt.xticks(rotation='vertical')
-plt.show()
-```
-
-```{python}
-# Salary in US
-us_data = df3[df.location==]
-```
-cate_loc = list(set(list(df['location'])))
-len(cate_loc) # 1050
-list(set(list(df['location']))).split(', ')
-
-# 4. Does work experience affect the salary of an employee? M will ask to his friend
 ```{python}
 sns.scatterplot(data=df3,x = 'yearsofexperience',y ='yearlysalary')
 plt.title("Yearly Salary vs Year of Experience")
@@ -652,7 +626,7 @@ plt.ylim(100000,1000000,50000)
 plt.xlim(0,20,5)
 ```
 
-# 5. Is working for more years in the same company affect the salary? B Done
+# 4. Is working for more years in the same company affect the salary? B Done
 
 Boxplot
 ```{python}
@@ -685,7 +659,7 @@ corr, _ = pearsonr(df3['yearsatcompany'], df3['yearlysalary'])
 print('Pearsons correlation: %.3f' % corr)
 ```
 
-# 6. In the recent five years, the average salary keeps the same? B Done
+# 5. In the recent five years, the average salary keeps the same? B Done
 
 ```{python}
 sns.barplot(data=df,x = 'timestamp',y ='yearlysalary')
@@ -779,7 +753,7 @@ print(conclusion)
 
 ```
 
-# 7. How large is the wage disparity between men and women?
+# How large is the wage disparity between men and women?
 ```{python}
 sns.boxplot(data=df3,x = 'gender', y = 'yearlysalary')
 plt.title("Gender vs Income")

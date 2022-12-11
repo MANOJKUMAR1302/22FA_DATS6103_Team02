@@ -110,36 +110,36 @@ print (df.shape)
 
 # Removing the Outliers on the basis of yearlysalary
 df1 = df.copy()
-print ("Shape Of The Before Ouliers: ",df.shape)
+print ("Shape Of The Before removing yearlysalary Outliers: ",df.shape)
 n=1.5
 IQR_1 = np.percentile(df1['yearlysalary'],75) - np.percentile(df1['yearlysalary'],25)
 #outlier = Q3 + n*IQR 8
 df1=df1[df1['yearlysalary'] < np.percentile(df1['yearlysalary'],75)+n*IQR_1]
 #outlier = Q1 - n*IQR 
 df1=df1[df1['yearlysalary'] > np.percentile(df1['yearlysalary'],25)-n*IQR_1]
-print ("Shape Of The After Ouliers: ",df1.shape)
+print ("Shape Of The After removing yearlysalary Outliers: ",df1.shape)
 
 # Removing the Outliers on the basis of yearsatcompany
 df2 = df1.copy()
-print ("Shape Of The Before Ouliers: ",df1.shape)
+print ("Shape Of The Before removing yearsatcompany at Outliers: ",df1.shape)
 n=1.5
 IQR_2 = np.percentile(df2['yearsatcompany'],75) - np.percentile(df2['yearsatcompany'],25)
 #outlier = Q3 + n*IQR 
 df2=df2[df2['yearsatcompany'] < np.percentile(df2['yearsatcompany'],75)+n*IQR_2]
 #outlier = Q1 - n*IQR 
 df2=df2[df2['yearsatcompany'] > np.percentile(df2['yearsatcompany'],25)-n*IQR_2]
-print ("Shape Of The After Ouliers: ",df2.shape)
+print ("Shape Of The After removing yearsatcompany Outliers: ",df2.shape)
 
 # Removing the Outliers on the basis of yearsofexperience
 df3 = df2.copy()
-print ("Shape Of The Before Ouliers: ",df2.shape)
+print ("Shape Of The Before removing yearsofexperience Outliers: ",df2.shape)
 n=1.5
 IQR_3 = np.percentile(df3['yearsofexperience'],75) - np.percentile(df3['yearsofexperience'],25)
 #outlier = Q3 + n*IQR 
 df3=df3[df3['yearsofexperience'] < np.percentile(df3['yearsofexperience'],75)+n*IQR_3]
 #outlier = Q1 - n*IQR 
 df3=df3[df3['yearsofexperience'] > np.percentile(df3['yearsofexperience'],25)-n*IQR_3]
-print ("Shape Of The After Ouliers: ",df3.shape)
+print ("Shape Of The After removing yearsofexperience Outliers: ",df3.shape)
 
 
 # Observing the first five rows of the dataframe after removing duplicates, null values, and Outliers
@@ -835,6 +835,52 @@ sns.heatmap(corr_matrix, cmap=plt.cm.CMRmap_r,annot=True)
 plt.show() 
 ```
 
+# Creating Dummy Variables
+
+```{python}
+# Checking for Unique Variables
+for col in df3.columns:
+    print(col, ':', len(df3[col].unique()))
+```
+
+```{python}
+# Considering the top 20 companies of Multicategorical Feature Company 
+df3.company.value_counts().sort_values(ascending=False).head(20)
+#df3.company.value_counts().sort_values(ascending=False).tail(20)
+```
+
+```{python}
+# Creating an array of top 20 companies names
+top_20=[x for x in df3.company.value_counts().sort_values(ascending=False).head(20).index]
+top_20
+```
+
+```{python}
+# Creating Binary Variables 
+
+for label in top_20:
+    df3[label]=np.where(df3['company']==label,1,0)
+df3[['company']+top_20].head(40)
+```
+
+```{python}
+def one_hot_top_x(df3,variable,top_x_labels):
+    for label in top_x_labels:
+        df3[variable+'_'+label]=np.where(df3[variable]==label,1,0)
+
+one_hot_top_x(df3,'title', top_20)
+df3.head()
+```
+
+```{python}
+top_20=[x for x in df3.location.value_counts().sort_values(ascending=False).head(20).index]
+one_hot_top_x(df3,'location',top_20)
+df3.head()
+```
+
+
+
+
 ```{python}
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
@@ -864,6 +910,7 @@ y_pred = regressor.predict(X_test)
 print('Predict : ', y_pred)
 
 ```
+
 
 
 ```{python}

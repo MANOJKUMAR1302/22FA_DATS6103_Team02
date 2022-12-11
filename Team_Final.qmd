@@ -604,8 +604,6 @@ According to ANOVA for salary mean by job position over year, salary by title ov
 
 # 3. Does location impact the salaries of the employees? M will ask to his friend
 
-States in US
-Does location impact the salaries of the employees? 
 ```{python}
 cate_loc = list(set(list(df['location'])))
 len(cate_loc) # 1050
@@ -630,6 +628,7 @@ us_data = df3[df.location==]
 cate_loc = list(set(list(df['location'])))
 len(cate_loc) # 1050
 list(set(list(df['location']))).split(', ')
+
 # 4. Does work experience affect the salary of an employee? M will ask to his friend
 ```{python}
 sns.scatterplot(data=df3,x = 'yearsofexperience',y ='yearlysalary')
@@ -805,7 +804,7 @@ plt.show()
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 
-X = df3.loc[:,['timestamp', 'yearsofexperience', 'yearsatcompany', 'totalyearlycompensation']]
+X = df3.loc[:,['timestamp', 'yearsofexperience', 'yearsatcompany', 'yearlysalary']]
 y = df3[['yearlysalary']]
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 0)

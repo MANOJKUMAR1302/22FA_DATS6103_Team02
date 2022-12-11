@@ -52,7 +52,7 @@ old_dfprofile = pp.ProfileReport(old_df)
 ```{python}
 # Preprocessing Dataset
 # Creating a new dataframe with selected Features
-df = old_df[['timestamp','company','title','location','yearsofexperience','yearsatcompany']]
+df = old_df[['timestamp','company','title','location','yearsofexperience','yearsatcompany', 'gender']]
 
 # Renaming the Totalyearlycompensation variable name into yearlysalary
 df['yearlysalary'] = old_df['totalyearlycompensation']
@@ -147,63 +147,15 @@ df3.head()
 
 # Descriptive Statistics Summary of the dataframe after removing duplicates, null values, and Outliers
 df3.describe()
-
+```
+```{python}
 # salary histogram for chekciing normality
+sns.distplot(df3.yearlysalary, fit = stats.norm)
 ```
 
 ## Exploratory Data Analysis
 
-# How large is the wage disparity between men and women?
-```{python}
-sns.boxplot(data=df3,x = 'gender', y = 'yearlysalary')
-plt.title("Salary by Gender")
-plt.ylim(0,500000,25000)
-```
-
-
-
-# 1. Is there a significant difference between the yearly salary in top 10 companies and the yearly salary in not-top-10 companies? B Done
-
-List all the companys in this dataframe
-```{python}
-print(f"the unique values:\n{pd.unique(df3.company)}")
-```
-
-
-Boxplot
-```{python}
-sns.boxplot(df3['yearlysalary'], orient="h").set_title('Yearly Salary -  before removing outliers')
-```
-
-
-Independent-Sample T Test (2 groups)
-
-Top 10 companies in the United States (https://fortune.com/fortune500/)
-
-H0: The means for the two populations are equal.
-H1: The means for the two populations are not equal.
-
-```{python}
-top10 = df3[df3.company.isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil"
-"McKesson"])]
-
-not10 = df3[~df3.company.isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil"
-"McKesson"])]
-```
-
-```{python}
-summary, results = rp.ttest(group1= top10['yearlysalary'], group1_name= "top10",
-                            group2= not10['yearlysalary'], group2_name= "not10")
-
-print(summary)
-print(results)
-
-df3['topcompany']=np.where((df3['company'].isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil", "McKesson"])) & (~df3['company'].isin([120,128])),1,0)
-
-```
-The average yearlysalary for top 10 company, M= 355205.521 , was statistically signigicantly higher than those not-top-10 companies(M= 320767.298); t= 23.239, p < 0.05
-
-# 2. Which job position has highest earning? Over time, salary by job title is changed?
+# 1. Which job position has highest earning? Over time, salary by job title is changed?
 
 ```{python}
 print (pd.unique(df3.title))
@@ -295,7 +247,7 @@ In 2021, highest job positions are Software Engineer, Software Engineering Manag
 From 2018 to 2021, job position such as Software Engineer, Software Engineering Manager, Data Scientist, Product Manager, Hardware Engineer made highly earning. 
 
 
-Hypothesis Testing for job position per year
+Hypothesis Testing for the salary of the job position per year
 
 ```{python}
 # H₀: Year by year salary means of software engineer are equal.
@@ -608,32 +560,118 @@ print(conclusion)
 # Reject H0
 ```
 
-According to ANOVA for salary mean by job position over year, salary by title over time is statistically significant, which means 
+According to ANOVA, the salary by title over time is statistically significant, which means salary over time per each job position is not equal.
 
-
-# 3. Does work experience affect the salary of an employee? M will ask to his friend
-
+# 2. How large is the wage disparity between gender?
 ```{python}
-sns.scatterplot(data=df3,x = 'yearsofexperience',y ='yearlysalary')
-plt.title("Yearly Salary vs Year of Experience")
-plt.xticks(rotation='vertical')
+sns.boxplot(data=df3,x = 'gender', y = 'yearlysalary')
+plt.title("Salary by Gender")
+plt.ylim(0,500000,25000)
 ```
 
 ```{python}
-sns.barplot(data=df3,x = 'yearsofexperience',y ='yearlysalary')
-plt.title("Yearly Salary vs Year of Experience")
-plt.xticks(rotation='vertical')
-plt.ylim(0,400000,25000)
-plt.xlim(0,35,5)
+# H₀: Salary by gender are equal.
+# H₁: Year by year salary means of Hardware Engineer are not equal.
+# α = 0.05
+
+HE = df3[df3['title'] == 'Hardware Engineer']
+
+HE_ANOVA = [['Between Groups', '', '', '', '', '', ''], ['Within Groups', '', '', '', '', '', ''], ['Total', '', '', '', '', '', '']] 
+HE_anova_table = pd.DataFrame(HE_ANOVA, columns = ['Source of Variation', 'SS', 'df', 'MS', 'F', 'P-value', 'F crit']) 
+HE_anova_table.set_index('Source of Variation', inplace = True)
+
+# calculate SSTR and update anova table
+x_bar = HE['yearlysalary'].mean()
+SSTR = HE.groupby('timestamp').count() * (HE.groupby('timestamp').mean() - x_bar)**2       
+HE_anova_table['SS']['Between Groups'] = SSTR['yearlysalary'].sum()
+
+# calculate SSE and update anova table
+SSE = (HE.groupby('timestamp').count() - 1) * HE.groupby('timestamp').std()**2
+HE_anova_table['SS']['Within Groups'] = SSE['yearlysalary'].sum()
+
+# calculate SSTR and update anova table
+SSTR = SSTR['yearlysalary'].sum() + SSE['yearlysalary'].sum()
+HE_anova_table['SS']['Total'] = SSTR
+
+# update degree of freedom
+HE_anova_table['df']['Between Groups'] = HE['timestamp'].nunique() - 1
+HE_anova_table['df']['Within Groups'] = HE.shape[0] - HE['timestamp'].nunique()
+HE_anova_table['df']['Total'] = HE.shape[0] - 1
+
+# calculate MS
+HE_anova_table['MS'] = HE_anova_table['SS'] / HE_anova_table['df']
+
+# calculate F 
+F = HE_anova_table['MS']['Between Groups'] / HE_anova_table['MS']['Within Groups']
+HE_anova_table['F']['Between Groups'] = F
+
+# p-value
+HE_anova_table['P-value']['Between Groups'] = 1 - stats.f.cdf(F, HE_anova_table['df']['Between Groups'], HE_anova_table['df']['Within Groups'])
+
+# F critical 
+alpha = 0.05
+# possible types "right-tailed, left-tailed, two-tailed"
+tail_hypothesis_type = "two-tailed"
+if tail_hypothesis_type == "two-tailed":
+    alpha /= 2
+HE_anova_table['F crit']['Between Groups'] = stats.f.ppf(1-alpha, HE_anova_table['df']['Between Groups'], HE_anova_table['df']['Within Groups'])
+
+# Final ANOVA Table
+HE_anova_table
+```
+```{python}
+print("The p-value approach to hypothesis testing in the decision rule")
+conclusion = "Failed to reject the null hypothesis."
+if HE_anova_table['P-value']['Between Groups'] <= alpha:
+    conclusion = "Null Hypothesis is rejected."
+print("F-score is:", HE_anova_table['F']['Between Groups'], " and p value is:", HE_anova_table['P-value']['Between Groups'])    
+print(conclusion)
+
+# Reject H0
+```                          
+
+
+# 3. Is there a significant difference between the yearly salary in top 10 companies and the yearly salary in not-top-10 companies? B Done
+
+List all the companys in this dataframe
+```{python}
+print(f"the unique values:\n{pd.unique(df3.company)}")
+```
+
+
+Boxplot
+```{python}
+sns.boxplot(df3['yearlysalary'], orient="h").set_title('Yearly Salary -  before removing outliers')
+```
+
+
+Independent-Sample T Test (2 groups)
+
+Top 10 companies in the United States (https://fortune.com/fortune500/)
+
+H0: The means for the two populations are equal.
+H1: The means for the two populations are not equal.
+
+```{python}
+top10 = df3[df3.company.isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil"
+"McKesson"])]
+
+not10 = df3[~df3.company.isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil"
+"McKesson"])]
 ```
 
 ```{python}
-sns.lineplot(data=df3,x = 'yearsofexperience',y ='yearlysalary')
-plt.title("Yearly Salary vs Year of Experience")
-plt.xticks(rotation='vertical')
-plt.ylim(100000,1000000,50000)
-plt.xlim(0,20,5)
+summary, results = rp.ttest(group1= top10['yearlysalary'], group1_name= "top10",
+                            group2= not10['yearlysalary'], group2_name= "not10")
+
+print(summary)
+print(results)
+
+df3['topcompany']=np.where((df3['company'].isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil", "McKesson"])) & (~df3['company'].isin([120,128])),1,0)
+
 ```
+The average yearlysalary for top 10 company, M= 355205.521 , was statistically signigicantly higher than those not-top-10 companies(M= 320767.298); t= 23.239, p < 0.05
+
 
 # 4. Is working for more years in the same company affect the salary? B Done
 
@@ -763,7 +801,29 @@ print(conclusion)
 ```
 
 
+# 6. Does work experience affect the salary of an employee? M will ask to his friend
 
+```{python}
+sns.scatterplot(data=df3,x = 'yearsofexperience',y ='yearlysalary')
+plt.title("Yearly Salary vs Year of Experience")
+plt.xticks(rotation='vertical')
+```
+
+```{python}
+sns.barplot(data=df3,x = 'yearsofexperience',y ='yearlysalary')
+plt.title("Yearly Salary vs Year of Experience")
+plt.xticks(rotation='vertical')
+plt.ylim(0,400000,25000)
+plt.xlim(0,35,5)
+```
+
+```{python}
+sns.lineplot(data=df3,x = 'yearsofexperience',y ='yearlysalary')
+plt.title("Yearly Salary vs Year of Experience")
+plt.xticks(rotation='vertical')
+plt.ylim(100000,1000000,50000)
+plt.xlim(0,20,5)
+```
 
 # Model Building
 

@@ -153,6 +153,15 @@ df3.describe()
 
 ## Exploratory Data Analysis
 
+# How large is the wage disparity between men and women?
+```{python}
+sns.boxplot(data=df3,x = 'gender', y = 'yearlysalary')
+plt.title("Salary by Gender")
+plt.ylim(0,500000,25000)
+```
+
+
+
 # 1. Is there a significant difference between the yearly salary in top 10 companies and the yearly salary in not-top-10 companies? B Done
 
 List all the companys in this dataframe
@@ -753,12 +762,6 @@ print(conclusion)
 
 ```
 
-# How large is the wage disparity between men and women?
-```{python}
-sns.boxplot(data=df3,x = 'gender', y = 'yearlysalary')
-plt.title("Gender vs Income")
-plt.ylim(0,500000,25000)
-```
 
 
 

@@ -21,11 +21,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import rfit 
 import plotly.express as px
 import scipy.stats as stats
 import sklearn
-from sklearn.datasets import load_boston 
 import researchpy as rp
 from scipy.stats import pearsonr
 import pandas_profiling as pp
@@ -716,7 +714,7 @@ plt.xticks(rotation='vertical')
 # Boxplot: yearlysalary vs timestamp
 sns.boxplot(data=df3,x = 'timestamp', y = 'yearlysalary')
 plt.title("Yearly Salary vs Year")
-plt.ylim(100000,750000,10000)
+plt.ylim(100000,450000,10000)
 ```
 
 ```{python}
@@ -799,7 +797,7 @@ print(conclusion)
 ```
 
 
-# 6. Does work experience affect the salary of an employee? M will ask to his friend
+# 6. How much do the employee's experience affect his or her salary?
 
 ```{python}
 sns.scatterplot(data=df3,x = 'yearsofexperience',y ='yearlysalary')
@@ -823,10 +821,15 @@ plt.ylim(100000,1000000,50000)
 plt.xlim(0,20,5)
 ```
 
-# Model Building
-
-Correlation matrix
 ```{python}
+# Pearson Correlation Matrix
+pearsoncorr=df3.corr(method='pearson')
+pearsoncorr
+```
+
+
+```{python}
+# Pearsons Correlation matrix Using Heatmap
 corr_matrix = df3.corr()
 print(corr_matrix)
 
@@ -835,7 +838,9 @@ sns.heatmap(corr_matrix, cmap=plt.cm.CMRmap_r,annot=True)
 plt.show() 
 ```
 
-# Creating Dummy Variables
+# Feature Engineering: 
+
+# Creating Dummy Variables using One Hot Encoding for Company and Location Features
 
 ```{python}
 # Checking for Unique Variables
@@ -870,6 +875,8 @@ one_hot_top_x(df3,'location',top_20)
 df3.head()
 ```
 
+# Creating Dummy Variables using pandas get_dummies function for gender, timestamp, title features
+
 ```{python}
 # Creating dummies for gender feature
 df_dummies = pd.get_dummies(df3, columns=['gender'])
@@ -899,11 +906,11 @@ from sklearn.model_selection import train_test_split
 #Defining X and y Variables for Train and Test Split
 X = df_dummies2.loc[:,['yearsofexperience', 'yearsatcompany','gender_Female','gender_Male','gender_Other','timestamp_2018','timestamp_2019','timestamp_2020','timestamp_2021','company_Amazon','company_Microsoft','company_Google','company_Facebook','company_Apple','company_Oracle','company_Salesforce','company_IBM','company_Intel','company_Cisco','company_Capital One','company_Uber','company_VMware','company_LinkedIn','company_JPMorgan Chase','company_Goldman Sachs','company_Qualcomm','company_Intuit','company_Bloomberg','company_PayPal','location_Seattle, WA','location_San Francisco, CA','location_New York, NY','location_Redmond, WA','location_Sunnyvale, CA','location_Mountain View, CA',
 'location_San Jose, CA','location_Austin, TX','location_Bangalore, KA, India','location_Cupertino, CA',	'location_Menlo Park, CA','location_Boston, MA','location_London, EN, United Kingdom',
-'location_Santa Clara, CA','location_Palo Alto, CA','location_Chicago, IL','location_San Diego, CA','location_Toronto, ON, Canada','location_Bellevue, WA','location_Bengaluru, KA, India']]
+'location_Santa Clara, CA','location_Palo Alto, CA','location_Chicago, IL','location_San Diego, CA','location_Toronto, ON, Canada','location_Bellevue, WA','location_Bengaluru, KA, India','title_Business Analyst','title_Data Scientist','title_Hardware Engineer','title_Human Resources','title_Management Consultant','title_Marketing','title_Mechanical Engineer','title_Product Designer','title_Product Manager','title_Recruiter','title_Sales','title_Software Engineer','title_Software Engineering Manager','title_Solution Architect','title_Technical Program Manager',]]
 y = df_dummies2[['yearlysalary']]
 
 # Splitling the data into Train and test Data
-X_train,X_test,y_train,y_test = train_test_split(X,y,train_size=0.7,random_state=100)
+X_train,X_test,y_train,y_test = train_test_split(X,y,train_size=0.8,random_state=100)
 ```
 
 ```{python}
@@ -930,14 +937,22 @@ print('Mean Squared Error of Linear Regression :',mse)
 print('R Square value of Linear Regression :',rsq)
 ```
 
+```{python}
+print("Intercepts of Linear Regression:",lr.intercept_)
+print("Coefficients of Linear Regression:",lr.coef_)
+```
+
 # Random Forest Regression Model
 
 ```{python}
 #Defining X and y Variables for Train and Test Split
 X = df_dummies2.loc[:,['yearsofexperience', 'yearsatcompany','gender_Female','gender_Male','gender_Other','timestamp_2018','timestamp_2019','timestamp_2020','timestamp_2021','company_Amazon','company_Microsoft','company_Google','company_Facebook','company_Apple','company_Oracle','company_Salesforce','company_IBM','company_Intel','company_Cisco','company_Capital One','company_Uber','company_VMware','company_LinkedIn','company_JPMorgan Chase','company_Goldman Sachs','company_Qualcomm','company_Intuit','company_Bloomberg','company_PayPal','location_Seattle, WA','location_San Francisco, CA','location_New York, NY','location_Redmond, WA','location_Sunnyvale, CA','location_Mountain View, CA',
 'location_San Jose, CA','location_Austin, TX','location_Bangalore, KA, India','location_Cupertino, CA',	'location_Menlo Park, CA','location_Boston, MA','location_London, EN, United Kingdom',
-'location_Santa Clara, CA','location_Palo Alto, CA','location_Chicago, IL','location_San Diego, CA','location_Toronto, ON, Canada','location_Bellevue, WA','location_Bengaluru, KA, India']]
+'location_Santa Clara, CA','location_Palo Alto, CA','location_Chicago, IL','location_San Diego, CA','location_Toronto, ON, Canada','location_Bellevue, WA','location_Bengaluru, KA, India','title_Business Analyst','title_Data Scientist','title_Hardware Engineer','title_Human Resources','title_Management Consultant','title_Marketing','title_Mechanical Engineer','title_Product Designer','title_Product Manager','title_Recruiter','title_Sales','title_Software Engineer','title_Software Engineering Manager','title_Solution Architect','title_Technical Program Manager',]]
 y = df_dummies2[['yearlysalary']]
+
+# Splitling the data into Train and test Data
+X_train,X_test,y_train,y_test = train_test_split(X,y,train_size=0.8,random_state=100)
 ```
 
 
@@ -963,7 +978,8 @@ from sklearn.metrics import r2_score
 R_Square_Score=r2_score(y,Pred)
 
 Mean_Square_error=mean_squared_error(y,Pred)
-print(R_Square_Score,Mean_Square_error)
+print('Mean Squared Error of Random Forest Regression: ',Mean_Square_error)
+print('R Square value of Random Forest Regression:',R_Square_Score)
 ```
 
 

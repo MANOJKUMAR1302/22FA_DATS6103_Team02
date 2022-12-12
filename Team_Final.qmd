@@ -878,7 +878,24 @@ one_hot_top_x(df3,'location',top_20)
 df3.head()
 ```
 
+```{python}
+# Creating dummies for gender feature
+df_dummies = pd.get_dummies(df3, columns=['gender'])
+```
 
+```{python}
+# Creating dummies for timestamp feature
+df_dummies1 = pd.get_dummies(df_dummies, columns=['timestamp'])
+```
+
+```{python}
+df_dummies2 = pd.get_dummies(df_dummies1, columns=['title'])
+df_dummies2.head()
+```
+
+```{python}
+df_dummies2.shape
+```
 
 
 ```{python}

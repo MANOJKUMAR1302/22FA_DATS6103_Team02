@@ -856,19 +856,11 @@ top_20
 ```
 
 ```{python}
-# Creating Binary Variables 
-
-for label in top_20:
-    df3[label]=np.where(df3['company']==label,1,0)
-df3[['company']+top_20].head(40)
-```
-
-```{python}
 def one_hot_top_x(df3,variable,top_x_labels):
     for label in top_x_labels:
         df3[variable+'_'+label]=np.where(df3[variable]==label,1,0)
 
-one_hot_top_x(df3,'title', top_20)
+one_hot_top_x(df3,'company', top_20)
 df3.head()
 ```
 
@@ -894,41 +886,48 @@ df_dummies2.head()
 ```
 
 ```{python}
+# After applying One Hot Encoding on company and location and Creating Dummies for gender, timestamp and title
 df_dummies2.shape
 ```
 
-
 ```{python}
+## Linear Regression Model
+# Import the Libraries for Train_Test_Split from scikit learn:
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
 
-X = df3.loc[:,['timestamp', 'yearsofexperience', 'yearsatcompany', 'yearlysalary']]
-y = df3[['yearlysalary']]
+#Defining X and y Variables for Train and Test Split
+X = df_dummies2.loc[:,['yearsofexperience', 'yearsatcompany','gender_Female','gender_Male','gender_Other','timestamp_2018','timestamp_2019','timestamp_2020','timestamp_2021','company_Amazon','company_Microsoft','company_Google','company_Facebook','company_Apple','company_Oracle','company_Salesforce','company_IBM','company_Intel','company_Cisco','company_Capital One','company_Uber','company_VMware','company_LinkedIn','company_JPMorgan Chase','company_Goldman Sachs','company_Qualcomm','company_Intuit','company_Bloomberg','company_PayPal','location_Seattle, WA','location_San Francisco, CA','location_New York, NY','location_Redmond, WA','location_Sunnyvale, CA','location_Mountain View, CA',
+'location_San Jose, CA','location_Austin, TX','location_Bangalore, KA, India','location_Cupertino, CA',	'location_Menlo Park, CA','location_Boston, MA','location_London, EN, United Kingdom',
+'location_Santa Clara, CA','location_Palo Alto, CA','location_Chicago, IL','location_San Diego, CA','location_Toronto, ON, Canada','location_Bellevue, WA','location_Bengaluru, KA, India']]
+y = df_dummies2[['yearlysalary']]
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 0)
-
-from sklearn.linear_model import Lasso
-regressor = Lasso()
-regressor.fit(X_train, y_train)
-
-w_0 = regressor.intercept_
-w_1 = regressor.coef_
-
-print('Interception : ', w_0)
-print('Coeficient : ', w_1)
-
-score = regressor.score(X_test, y_test)
-print('Score: ', score)
-print('Accuracy: ' + str(score*100) + '%')
-
-
-y_pred = regressor.predict(X_test)
-
-print('Predict : ', y_pred)
-
+# Splitling the data into Train and test Data
+X_train,X_test,y_train,y_test = train_test_split(X,y,train_size=0.7,random_state=100)
 ```
 
+```{python}
+# Importing Linear Regression model from scikit learn
+from sklearn.linear_model import LinearRegression
+lr = LinearRegression()
+# Fitting X train and y train in Linear Regression
+lr.fit(X_train,y_train)
+```
 
+```{python}
+# Predicting the value of y
+y_pred = lr.predict(X_test)
+```
+
+```{python}
+# Importing metrics for the evaluation of the model
+from sklearn.metrics import r2_score,mean_squared_error
+# calculate Mean square error
+mse = mean_squared_error(y_test,y_pred)
+# Calculate R square vale
+rsq = r2_score(y_test,y_pred)
+print('Mean Squared Error of Linear Regression :',mse)
+print('R Square value of Linear Regression :',rsq)
+```
 
 ```{python}
 # How many NAs in column Education and Race?

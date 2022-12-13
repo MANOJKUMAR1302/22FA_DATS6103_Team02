@@ -902,6 +902,17 @@ df_dummies2.head()
 df_dummies2.shape
 ```
 
+```{python}
+# To Replace ' ' with '' in column heading
+df_dummies2.columns=df_dummies2.columns.str.replace(' ','')
+```
+
+```{python}
+# To Replace ',' with '_' in column heading
+df_dummies2.columns=df_dummies2.columns.str.replace(',','_')
+df_dummies2.head()
+```
+
 ## Linear Regression Model
 
 ```{python}
@@ -909,9 +920,7 @@ df_dummies2.shape
 from sklearn.model_selection import train_test_split
 
 #Defining X and y Variables for Train and Test Split
-X = df_dummies2.loc[:,['yearsofexperience', 'yearsatcompany','gender_Female','gender_Male','gender_Other','timestamp_2018','timestamp_2019','timestamp_2020','timestamp_2021','company_Amazon','company_Microsoft','company_Google','company_Facebook','company_Apple','company_Oracle','company_Salesforce','company_IBM','company_Intel','company_Cisco','company_Capital One','company_Uber','company_VMware','company_LinkedIn','company_JPMorgan Chase','company_Goldman Sachs','company_Qualcomm','company_Intuit','company_Bloomberg','company_PayPal','location_Seattle, WA','location_San Francisco, CA','location_New York, NY','location_Redmond, WA','location_Sunnyvale, CA','location_Mountain View, CA',
-'location_San Jose, CA','location_Austin, TX','location_Bangalore, KA, India','location_Cupertino, CA',	'location_Menlo Park, CA','location_Boston, MA','location_London, EN, United Kingdom',
-'location_Santa Clara, CA','location_Palo Alto, CA','location_Chicago, IL','location_San Diego, CA','location_Toronto, ON, Canada','location_Bellevue, WA','location_Bengaluru, KA, India','title_Business Analyst','title_Data Scientist','title_Hardware Engineer','title_Human Resources','title_Management Consultant','title_Marketing','title_Mechanical Engineer','title_Product Designer','title_Product Manager','title_Recruiter','title_Sales','title_Software Engineer','title_Software Engineering Manager','title_Solution Architect','title_Technical Program Manager',]]
+X = df_dummies2.loc[:,['yearsofexperience','company_Amazon','company_Microsoft','company_Google','company_Facebook','company_Apple','company_Oracle','company_Salesforce','company_IBM','company_Intel','company_Cisco','company_CapitalOne','company_Uber','company_VMware','company_LinkedIn','company_JPMorganChase','company_GoldmanSachs','company_Qualcomm','company_Intuit','company_Bloomberg','company_PayPal','location_Seattle_WA','location_SanFrancisco_CA','location_NewYork_NY','location_Redmond_WA','location_Sunnyvale_CA','location_MountainView_CA','location_SanJose_CA','location_Austin_TX','location_Bangalore_KA_India','location_Cupertino_CA','location_MenloPark_CA','location_Boston_MA','location_London_EN_UnitedKingdom','location_SantaClara_CA','location_PaloAlto_CA','location_Chicago_IL','location_SanDiego_CA','location_Toronto_ON_Canada','location_Bellevue_WA','location_Bengaluru_KA_India','gender_Female','gender_Male','gender_Other','timestamp_2018','timestamp_2019','timestamp_2020','timestamp_2021','title_BusinessAnalyst','title_DataScientist','title_HardwareEngineer','title_HumanResources','title_ManagementConsultant','title_Marketing','title_MechanicalEngineer','title_ProductDesigner','title_ProductManager','title_Recruiter','title_Sales','title_SoftwareEngineer','title_SoftwareEngineeringManager','title_SolutionArchitect','title_TechnicalProgramManager',]]
 y = df_dummies2[['yearlysalary']]
 
 # Splitling the data into Train and test Data
@@ -938,8 +947,10 @@ from sklearn.metrics import r2_score,mean_squared_error
 mse = mean_squared_error(y_test,y_pred)
 # Calculate R square vale
 rsq = r2_score(y_test,y_pred)
-print('Mean Squared Error of Linear Regression :',mse)
-print('R Square value of Linear Regression :',rsq)
+print('Mean Squared Error of Linear Regression :',round(mse,5))
+print('R Square value of Linear Regression :',round(rsq,5))
+print("The Training R Square value is: %2f"%lr_model.score(X_train,y_train))
+print("The Testing R Square value is: %2f"%lr_model.score(X_test,y_test))
 ```
 
 ```{python}
@@ -947,13 +958,19 @@ print("Intercepts of Linear Regression:",lr.intercept_)
 print("Coefficients of Linear Regression:",lr.coef_)
 ```
 
+```{python}
+import statsmodels
+import statsmodels.formula.api as smf
+lin_model = smf.ols(formula= 'yearlysalary~yearsofexperience+company_Amazon+company_Microsoft+company_Google+company_Facebook+company_Apple+company_Oracle+company_Salesforce+company_IBM+company_Intel+company_Cisco+company_CapitalOne+company_Uber+company_VMware+company_LinkedIn+company_JPMorganChase+company_GoldmanSachs+company_Qualcomm+company_Intuit+company_Bloomberg+company_PayPal+location_Seattle_WA+location_SanFrancisco_CA+location_NewYork_NY+location_Redmond_WA+location_Sunnyvale_CA+location_MountainView_CA+location_SanJose_CA+location_Austin_TX+location_Bangalore_KA_India+location_Cupertino_CA+location_MenloPark_CA+location_Boston_MA+location_London_EN_UnitedKingdom+location_SantaClara_CA+location_PaloAlto_CA+location_Chicago_IL+location_SanDiego_CA+location_Toronto_ON_Canada+location_Bellevue_WA+location_Bengaluru_KA_India+gender_Female+gender_Male+gender_Other+timestamp_2018+timestamp_2019+timestamp_2020+timestamp_2021+title_BusinessAnalyst+title_DataScientist+title_HardwareEngineer+title_HumanResources+title_ManagementConsultant+title_Marketing+title_MechanicalEngineer+title_ProductDesigner+title_ProductManager+title_Recruiter+title_Sales+title_SoftwareEngineer+title_SoftwareEngineeringManager+title_SolutionArchitect+title_TechnicalProgramManager',data=df_dummies2).fit()
+lin_model.summary()
+```
+
+
 # Random Forest Regression Model
 
 ```{python}
 #Defining X and y Variables for Train and Test Split
-X = df_dummies2.loc[:,['yearsofexperience', 'yearsatcompany','gender_Female','gender_Male','gender_Other','timestamp_2018','timestamp_2019','timestamp_2020','timestamp_2021','company_Amazon','company_Microsoft','company_Google','company_Facebook','company_Apple','company_Oracle','company_Salesforce','company_IBM','company_Intel','company_Cisco','company_Capital One','company_Uber','company_VMware','company_LinkedIn','company_JPMorgan Chase','company_Goldman Sachs','company_Qualcomm','company_Intuit','company_Bloomberg','company_PayPal','location_Seattle, WA','location_San Francisco, CA','location_New York, NY','location_Redmond, WA','location_Sunnyvale, CA','location_Mountain View, CA',
-'location_San Jose, CA','location_Austin, TX','location_Bangalore, KA, India','location_Cupertino, CA',	'location_Menlo Park, CA','location_Boston, MA','location_London, EN, United Kingdom',
-'location_Santa Clara, CA','location_Palo Alto, CA','location_Chicago, IL','location_San Diego, CA','location_Toronto, ON, Canada','location_Bellevue, WA','location_Bengaluru, KA, India','title_Business Analyst','title_Data Scientist','title_Hardware Engineer','title_Human Resources','title_Management Consultant','title_Marketing','title_Mechanical Engineer','title_Product Designer','title_Product Manager','title_Recruiter','title_Sales','title_Software Engineer','title_Software Engineering Manager','title_Solution Architect','title_Technical Program Manager',]]
+X = df_dummies2.loc[:,['yearsofexperience','company_Amazon','company_Microsoft','company_Google','company_Facebook','company_Apple','company_Oracle','company_Salesforce','company_IBM','company_Intel','company_Cisco','company_CapitalOne','company_Uber','company_VMware','company_LinkedIn','company_JPMorganChase','company_GoldmanSachs','company_Qualcomm','company_Intuit','company_Bloomberg','company_PayPal','location_Seattle_WA','location_SanFrancisco_CA','location_NewYork_NY','location_Redmond_WA','location_Sunnyvale_CA','location_MountainView_CA','location_SanJose_CA','location_Austin_TX','location_Bangalore_KA_India','location_Cupertino_CA','location_MenloPark_CA','location_Boston_MA','location_London_EN_UnitedKingdom','location_SantaClara_CA','location_PaloAlto_CA','location_Chicago_IL','location_SanDiego_CA','location_Toronto_ON_Canada','location_Bellevue_WA','location_Bengaluru_KA_India','gender_Female','gender_Male','gender_Other','timestamp_2018','timestamp_2019','timestamp_2020','timestamp_2021','title_BusinessAnalyst','title_DataScientist','title_HardwareEngineer','title_HumanResources','title_ManagementConsultant','title_Marketing','title_MechanicalEngineer','title_ProductDesigner','title_ProductManager','title_Recruiter','title_Sales','title_SoftwareEngineer','title_SoftwareEngineeringManager','title_SolutionArchitect','title_TechnicalProgramManager',]]
 y = df_dummies2[['yearlysalary']]
 
 # Splitling the data into Train and test Data
@@ -983,8 +1000,10 @@ from sklearn.metrics import r2_score
 R_Square_Score=r2_score(y,Pred)
 
 Mean_Square_error=mean_squared_error(y,Pred)
-print('Mean Squared Error of Random Forest Regression: ',Mean_Square_error)
-print('R Square value of Random Forest Regression:',R_Square_Score)
+print('Mean Squared Error of Random Forest Regression: ',round(Mean_Square_error,5))
+print('R Square value of Random Forest Regression:',round(R_Square_Score,6))
+print("The Training R Square value is: %2f"%Reg_model.score(X_train,y_train))
+print("The Testing R Square value is: %2f"%Reg_model.score(X_test,y_test))
 ```
 
 

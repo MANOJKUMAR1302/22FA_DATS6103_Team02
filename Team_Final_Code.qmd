@@ -640,12 +640,6 @@ print(f"the unique values:\n{pd.unique(df3.company)}")
 ```
 
 
-Boxplot
-```{python}
-sns.boxplot(df3['yearlysalary'], orient="h").set_title('Yearly Salary -  before removing outliers')
-```
-
-
 Independent-Sample T Test (2 groups)
 
 Top 10 companies in the United States (https://fortune.com/fortune500/)
@@ -659,8 +653,20 @@ top10 = df3[df3.company.isin(["Apple","apple","APPLE","Walmart Labs","Walmart","
 
 not10 = df3[~df3.company.isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil"
 "McKesson"])]
+
+df3['topcompany']=np.where((df3['company'].isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil", "McKesson"])) & (~df3['company'].isin([120,128])),1,0)
 ```
 
+
+Distribution of yearly salary
+```{python}
+
+sns.violinplot(x=df3['topcompany'], y=df3["yearlysalary"]).set(title='Distribution of yearly salary')
+
+```
+
+
+T-Test
 ```{python}
 summary, results = rp.ttest(group1= top10['yearlysalary'], group1_name= "top10",
                             group2= not10['yearlysalary'], group2_name= "not10")
@@ -668,37 +674,32 @@ summary, results = rp.ttest(group1= top10['yearlysalary'], group1_name= "top10",
 print(summary)
 print(results)
 
-df3['topcompany']=np.where((df3['company'].isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil", "McKesson"])) & (~df3['company'].isin([120,128])),1,0)
-
 ```
 The average yearlysalary for top 10 company, M= 355205.521 , was statistically signigicantly higher than those not-top-10 companies(M= 320767.298); t= 23.239, p < 0.05
 
 
 # 4. Is working for more years in the same company affect the salary? 
 
-Boxplot
+Distribution of yeas at company
 ```{python}
-sns.boxplot(df['yearsatcompany']).set_title('Years at Company - before removing outliers')
-```
 
-```{python}
-sns.boxplot(df3['yearsatcompany']).set_title('Years at Company - after removing outliers')
+sns.histplot(data=df3, x="yearsatcompany", bins = 8, binrange = (0.5, 8.5)).set_title('Years at Company')
+plt.show()
 
-```
-Scatterplot & Linear Regression Fit Line
 
-Before Removing Outliers
-```{python}
-sns.regplot(x=df["yearsatcompany"], y=df["yearlysalary"], line_kws={"color":"r","alpha":0.7,"lw":2}).set_title('Before removing outliers')
+sns.boxplot(x="topcompany", y="yearsatcompany", data=df3, palette="Set1", width=0.5).set_title('Years at Company')
 plt.show()
 
 ```
-After Removing Outliers
+
+
+Scatterplot & Linear Regression Fit Line
 ```{python}
 sns.regplot(x=df3["yearsatcompany"], y=df3["yearlysalary"], line_kws={"color":"r","alpha":0.7,"lw":2}).set_title('After removing outliers')
 plt.show()
 
 ```
+
 
 calculate the Pearson's correlation between two variables
 ```{python}
@@ -707,28 +708,18 @@ corr, _ = pearsonr(df3['yearsatcompany'], df3['yearlysalary'])
 print('Pearsons correlation: %.3f' % corr)
 ```
 
+
 # 5. In the recent five years, the average salary keeps the same?
 
+Distribution of yearly by timestamp
 ```{python}
-sns.barplot(data=df,x = 'timestamp',y ='yearlysalary')
-plt.title("Timestamp vs Yearlysalary")
-plt.xticks(rotation='vertical')
+sns.violinplot(x=df3['timestamp'], y=df3["yearlysalary"]).set(title='Distribution of yearly salary in 4 years')
 ```
 
-```{python}
-# Boxplot: yearlysalary vs timestamp
-sns.boxplot(data=df3,x = 'timestamp', y = 'yearlysalary')
-plt.title("Yearly Salary vs Year")
-plt.ylim(100000,450000,10000)
-```
 
+Q-Q Plot (Normality Assumption Check)
 ```{python}
-sns.countplot(data=df,x = 'timestamp')
-plt.title("Time Stamp")
-```
 
-```{python}
-# Q-Q Plot (Normality Assumption Check)
 unique_time = df3['timestamp'].unique()
 for timestamp in unique_time:
     stats.probplot(df3[df3['timestamp'] == timestamp]['yearlysalary'], dist="norm", plot=plt)
@@ -737,9 +728,11 @@ for timestamp in unique_time:
 ```
 From the above figure, we may assume that the data for each group falls roughly on a straight line.
 
+
+ANOVA Test
 ```{python}
 # Hypothesis Testing
-# H₀: μ1= μ2 = μ3 = μ4 = μ5
+# H₀: μ1= μ2 = μ3 = μ4
 # H₁: Not all yearlysalary means are equal
 # α = 0.05
 
@@ -789,6 +782,8 @@ anova_table['F crit']['Between Groups'] = stats.f.ppf(1-alpha, anova_table['df']
 anova_table
 ```
 
+
+ANOVA Test Result
 ```{python}
 print("The p-value approach to hypothesis testing in the decision rule")
 conclusion = "Failed to reject the null hypothesis."

@@ -944,8 +944,8 @@ mse = mean_squared_error(y_test,y_pred)
 rsq = r2_score(y_test,y_pred)
 print('Mean Squared Error of Linear Regression :',round(mse,5))
 print('R Square value of Linear Regression :',round(rsq,5))
-print("The Training R Square value is: %2f"%lr_model.score(X_train,y_train))
-print("The Testing R Square value is: %2f"%lr_model.score(X_test,y_test))
+print("The Training R Square value is: %2f"%lr.score(X_train,y_train))
+print("The Testing R Square value is: %2f"%lr.score(X_test,y_test))
 ```
 
 ```{python}
@@ -997,28 +997,10 @@ R_Square_Score=r2_score(y,Pred)
 Mean_Square_error=mean_squared_error(y,Pred)
 print('Mean Squared Error of Random Forest Regression: ',round(Mean_Square_error,5))
 print('R Square value of Random Forest Regression:',round(R_Square_Score,6))
-print("The Training R Square value is: %2f"%Reg_model.score(X_train,y_train))
-print("The Testing R Square value is: %2f"%Reg_model.score(X_test,y_test))
+print("The Training R Square value is: %2f"%regressor.score(X_train,y_train))
+print("The Testing R Square value is: %2f"%regressor.score(X_test,y_test))
 ```
 
-
-
-```{python}
-# How many NAs in column Education and Race?
-old_df['Education'].isna().sum()
-# 32272
-
-old_df['Race'].isna().sum()
-# 40215
-
-```
-
-
-
-
-# Which title (role) in the not-top-10 companies should I look for if I want to earn my salary over 200K a year. (I have 3-year of work experience and want to find a job in NY)
-
-# What's the range of yearly salay of a male works in top 10 company in CA (no work experience)?
 
 
 # Conclusion

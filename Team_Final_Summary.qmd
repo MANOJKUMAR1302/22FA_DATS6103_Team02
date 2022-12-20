@@ -1,5 +1,5 @@
 ---
-title: "6103 Team"
+title: "Data Science and Stem Salaries - How to land in a high Paying jobs"
 author: Brooklyn Chen, Manojkumar Yerraguntla, Nayaeun Kwon
 format:
     html:    
@@ -10,9 +10,36 @@ format:
         toc-float: true
         toc-location: left
 execute: 
+  echo: false
   result: hide
   warning: false
 ---
+# Introduction
+
+## Data Science and Stem Salaries
+
+## Prior Reserch and Analysis
+
+## About the Dataset
+
+This dataset is collected from Kaggle in order to explore Data Science and Stem Salaries.
+
+Our original dataset has approximately 62,000 observations with 29 features.
+
+There are some duplicates, null values and outliers in our dataset. After removing the duplicates, null values and outliers in our dataset we are left with 35973 observations.
+
+
+
+We have considered the below mentioned features in our final dataset:
+
+timestamp: When the data was recorded
+company: Company name into which employee got selected
+title: Jop title of the employee
+yearlysalary: Amount of salary earned by the employee
+location: Job location 
+yearsofexperience: Year of Experience
+yearsatcompany: Years of experience at same company
+gender: Male or Female 
 
 ```{python}
 #| output: false
@@ -35,7 +62,6 @@ pd.set_option('display.colheader_justify', 'center')
 pd.set_option('display.precision', 3)
 ```
 
-# Dataset
 ```{python}
 #| output: false
 
@@ -44,11 +70,7 @@ old_df=pd.read_csv('Levels_Fyi_Salary_Data.csv')
 
 # Explore Dataset
 old_dfprofile = pp.ProfileReport(old_df)
-#old_dfprofile
-```
 
-```{python}
-# Preprocessing Dataset
 # Creating a new dataframe with selected Features
 df = old_df[['timestamp','company','title','yearsofexperience','yearsatcompany', 'gender', 'location']]
 
@@ -57,37 +79,17 @@ df['yearlysalary'] = old_df['totalyearlycompensation']
 
 # Coverting timestamp feature from MM-DD-YYYY HH:MM:SS format to YYYY format
 df['timestamp'] = pd.to_datetime(df['timestamp']).dt.strftime('%Y')
-
 ```
 
-
-Out of 30 features we have considered the below features in our final Dataframe:
-
-timestamp: When the data was recorded
-company: Company name into which employee got selected
-title: Jop title of the employee
-yearlysalary: Amount of salary earned by the employee
-location: Job location 
-yearsofexperience: Year of Experience
-yearsatcompany: Years of experience at same company
-gender: Male or Female
-
-
-Removed the following variables in our final Dataframe:
-level, otherdetails, tag, basesalary, stockgrantvalue, bonus, cityid, dmaid, rowNumber, Race, Education
+Salary histogram for checking normality before removing NA Values, Duplicates and Outliers.
+```{python}
+# salary histogram for checking normality
+sns.distplot(df.yearlysalary, fit = stats.norm)
+```
 
 ```{python}
 # Removing a row which has irrelavent value for feature Gender='Title: Senior Software Engineer'
 df=df.drop(labels=11010,axis=0)
-
-# Observing the Number of Rows of Number of Columns in the dataframe
-df.shape
-
-# Printing the top five Rows of the dataframe
-df.head()
-
-# Descriptive Statistics Summary of the dataframe
-df.describe()
 
 # checking for number of duplicates
 df.duplicated().sum()
@@ -101,16 +103,6 @@ df.isnull().sum()
 # Removing the null values
 df=df.dropna()
 
-# Rehecking the number of null values
-print (df.isnull().sum())
-print (df.shape)
-```
-```{python}
-# salary histogram for chekciing normality
-sns.distplot(df.yearlysalary, fit = stats.norm)
-```
-
-```{python}
 # Removing the Outliers on the basis of yearlysalary
 df1 = df.copy()
 print ("Shape Of The Before removing yearlysalary Outliers: ",df.shape)
@@ -144,27 +136,31 @@ df3=df3[df3['yearsofexperience'] < np.percentile(df3['yearsofexperience'],75)+n*
 df3=df3[df3['yearsofexperience'] > np.percentile(df3['yearsofexperience'],25)-n*IQR_3]
 print ("Shape Of The After removing yearsofexperience Outliers: ",df3.shape)
 
-
+dataframe=df3
 # Observing the first five rows of the dataframe after removing duplicates, null values, and Outliers
 df3.head()
 
 # Descriptive Statistics Summary of the dataframe after removing duplicates, null values, and Outliers
 df3.describe()
 ```
+
+Salary histogram for checking normality after removing NA Values, Duplicates and Outliers.
 ```{python}
 # salary histogram for chekciing normality
 sns.distplot(df3.yearlysalary, fit = stats.norm)
 ```
 
-## Exploratory Data Analysis
+# Exploratory Data Analysis
 
-# 1. Which job position has highest earning? Over time, salary by job title is changed?
+## Which job position has highest earning? Over time, salary by job title is changed?
 
+Unique titles in our dataset
 ```{python}
 print (pd.unique(df3.title))
 print (df3['title'].nunique())
 ```
 
+Piechart for each job title and their repsective percentages
 ```{python}
 print (df3['title'].value_counts())
 fig = px.pie(df3, names = 'title', title = 'Title')
@@ -194,6 +190,7 @@ plt.show()
 
 Software engineering manager has highest earning.
 
+2018 top 5 highest earner
 ```{python}
 # 2018 top 5 highest earner
 df2018 = df3[df3.timestamp=='2018']
@@ -204,6 +201,7 @@ highearn1
 
 In 2018, highest job positions are Software Engineer, Data Scientist, Software Engineering Manager.
 
+2019 top 10 highest earner
 ```{python}
 # 2019 top 10 highest earner
 
@@ -216,6 +214,7 @@ highearn2
 
 In 2019, highest job positions are Product Manager, Software Engineer, Software Engineering Manager.
 
+2020 top 10 highest earner
 ```{python}
 # 2020 top 10 highest earner
 
@@ -228,6 +227,7 @@ highearn3
 
 In 2020, highest job positions are Software Engineer, Software Engineering Manager, Hardware Engineer, Product Manager, Data Scientist.
 
+2021 top 10 highest earner
 ```{python}
 # 2021 top 10 highest earner
 
@@ -242,13 +242,6 @@ In 2021, highest job positions are Software Engineer, Software Engineering Manag
 
 From 2018 to 2021, job position such as Software Engineer, Software Engineering Manager, Data Scientist, Product Manager, Hardware Engineer made highly earning. 
 
-
-```{python}
-topjob_df = df3[df3.title == 'Software Engineer']
-
-sns.lineplot ( x= "title", y = 'yearlysalary', data = topjob_df)
-
-```
 
 Hypothesis Testing for the salary of the job position per year
 
@@ -565,13 +558,14 @@ print(conclusion)
 
 According to ANOVA, the salary by title over time is statistically significant, which means salary over time per each job position is not equal.
 
-# 2. How large is the wage disparity between gender?
+## How large is the wage disparity between gender?
 ```{python}
 sns.boxplot(data=df3,x = 'gender', y = 'yearlysalary')
 plt.title("Salary by Gender")
 plt.ylim(0,500000,25000)
 ```
 
+ANOVA Test on Gender Feature
 ```{python}
 # H₀: Salary by gender are equal.
 # H₁: Salary by gender are not equal.
@@ -620,6 +614,7 @@ gender_anova_table['F crit']['Between Groups'] = stats.f.ppf(1-alpha, gender_ano
 # Final ANOVA Table
 gender_anova_table
 ```
+Conclusion of ANOVA Test of Gender Feature 
 ```{python}
 print("The p-value approach to hypothesis testing in the decision rule")
 conclusion = "Failed to reject the null hypothesis."
@@ -632,7 +627,7 @@ print(conclusion)
 ```                          
 
 
-# 3. Is there a significant difference between the yearly salary in top 10 companies and the yearly salary in not-top-10 companies?
+## Is there a significant difference between the yearly salary in top 10 companies and the yearly salary in not-top-10 companies?
 
 List all the companys in this dataframe
 ```{python}
@@ -678,7 +673,7 @@ print(results)
 The average yearlysalary for top 10 company, M= 355205.521 , was statistically signigicantly higher than those not-top-10 companies(M= 320767.298); t= 23.239, p < 0.05
 
 
-# 4. Is working for more years in the same company affect the salary? 
+## Is working for more years in the same company affect the salary? 
 
 Distribution of yeas at company
 ```{python}
@@ -709,7 +704,7 @@ print('Pearsons correlation: %.3f' % corr)
 ```
 
 
-# 5. In the recent five years, the average salary keeps the same?
+## In the recent five years, the average salary keeps the same?
 
 Distribution of yearly by timestamp
 ```{python}
@@ -797,13 +792,7 @@ print(conclusion)
 ```
 
 
-# 6. How much do the employee's experience affect his or her salary?
-
-```{python}
-sns.scatterplot(data=df3,x = 'yearsofexperience',y ='yearlysalary')
-plt.title("Yearly Salary vs Year of Experience")
-plt.xticks(rotation='vertical')
-```
+## How much do the employee's experience affect his or her salary?
 
 ```{python}
 sns.barplot(data=df3,x = 'yearsofexperience',y ='yearlysalary')
@@ -821,16 +810,28 @@ plt.ylim(100000,1000000,50000)
 plt.xlim(0,20,5)
 ```
 
+•	There are lot of fluctuations in the salary of employees in the initial 8-9 years, because of some reasons like constant shifting companies and less salaries in the career beginning and have a constant growth in the salary after that.
+
+***Pearson’s Correlation Matrix:***
+
+Pearson's correlation is utilized when you have two quantitative variables and you wish to see if there is a linear relationship between those variables.
+
+The three possible research hypotheses state whether or not there is a linear relationship between the two variables.
+1)	The variables are positively correlated (as one variable gets larger so does the other),
+2)	The variables are negatively correlated (as one variable gets larger the other gets smaller),
+3)	The variables are not correlated (there is no relationship between the two variables).ter that.
+
+
 ```{python}
 # Pearson Correlation Matrix
-pearsoncorr=df3.corr(method='pearson')
+pearsoncorr=dataframe.corr(method='pearson')
 pearsoncorr
 ```
 
 
 ```{python}
 # Pearsons Correlation matrix Using Heatmap
-corr_matrix = df3.corr()
+corr_matrix = dataframe.corr()
 print(corr_matrix)
 
 plt.figure(figsize=(12,10))
@@ -838,28 +839,45 @@ sns.heatmap(corr_matrix, cmap=plt.cm.CMRmap_r,annot=True)
 plt.show() 
 ```
 
-# Feature Engineering: 
+The correlation between yearlysalary and yearsofexperiecne is 0.36 which means that both the variables are moderatel correlated to each other.
 
-# Creating Dummy Variables using One Hot Encoding for Company and Location Features
+# Feature Engineering:
 
+Feature engineering is a machine learning approach that uses data to generate new variables that were not included in the training set. It can develop new features for both supervised and unsupervised learning, with the objective of simplifying and speeding up data transformations while simultaneously boosting model correctness.
+
+The process of designing artificial features into an algorithm is referred to as feature engineering. These fake traits are then employed by the algorithm to increase its performance, or to yield better results. Data scientists spend the majority of their time working with data, thus accuracy is critical.
+
+When feature engineering operations are carried out appropriately, the final dataset is optimum and contains all of the relevant aspects influencing the business challenge. As a consequence of these datasets, the most accurate prediction models and the most relevant insights are created.
+
+
+## Creating Dummy Variables using One Hot Encoding for Company and Location Features
+
+***One Hot Encoding***
+
+One hot encoding can be defined as the important process of changing the categorical data variables to be delivered to machine and deep learning algorithms which in turn increase predictions as well as classification accuracy of a model.
+
+Checking for Unique Variables
 ```{python}
 # Checking for Unique Variables
-for col in df3.columns:
+for col in dataframe.columns:
     print(col, ':', len(df3[col].unique()))
 ```
 
+Considering the top 20 companies of Multicategorical Feature Company 
 ```{python}
 # Considering the top 20 companies of Multicategorical Feature Company 
 df3.company.value_counts().sort_values(ascending=False).head(20)
 #df3.company.value_counts().sort_values(ascending=False).tail(20)
 ```
 
+Creating an array of top 20 companies names
 ```{python}
 # Creating an array of top 20 companies names
 top_20=[x for x in df3.company.value_counts().sort_values(ascending=False).head(20).index]
 top_20
 ```
 
+Function for performing one hot encoding
 ```{python}
 def one_hot_top_x(df3,variable,top_x_labels):
     for label in top_x_labels:
@@ -872,41 +890,38 @@ df3.head()
 ```{python}
 top_20=[x for x in df3.location.value_counts().sort_values(ascending=False).head(20).index]
 one_hot_top_x(df3,'location',top_20)
-df3.head()
 ```
 
-# Creating Dummy Variables using pandas get_dummies function for gender, timestamp, title features
+## Creating Dummy Variables using pandas get_dummies function for gender, timestamp, title features
+
+***Get_dummies***
+Pandas get_dummies() is used for data manipulation. It converts categorical data into dummy or indicator variables.  A dummy or indicator variable can have a value of 0 or 1.
 
 ```{python}
 # Creating dummies for gender feature
 df_dummies = pd.get_dummies(df3, columns=['gender'])
-```
 
-```{python}
 # Creating dummies for timestamp feature
 df_dummies1 = pd.get_dummies(df_dummies, columns=['timestamp'])
-```
 
-```{python}
 df_dummies2 = pd.get_dummies(df_dummies1, columns=['title'])
-df_dummies2.head()
-```
 
-```{python}
 # After applying One Hot Encoding on company and location and Creating Dummies for gender, timestamp and title
 df_dummies2.shape
-```
 
-```{python}
 # To Replace ' ' with '' in column heading
 df_dummies2.columns=df_dummies2.columns.str.replace(' ','')
-```
 
-```{python}
 # To Replace ',' with '_' in column heading
 df_dummies2.columns=df_dummies2.columns.str.replace(',','_')
 df_dummies2.head()
 ```
+
+# Predictive Analysis
+
+***Linear Regression***
+
+Linear regression is a technique that offers a linear connection between an independent variable and a dependent variable to predict the outcome of future events. It is a statistical approach used in data science and machine learning for predictive analysis.
 
 ## Linear Regression Model
 
@@ -944,8 +959,8 @@ mse = mean_squared_error(y_test,y_pred)
 rsq = r2_score(y_test,y_pred)
 print('Mean Squared Error of Linear Regression :',round(mse,5))
 print('R Square value of Linear Regression :',round(rsq,5))
-print("The Training R Square value is: %2f"%lr_model.score(X_train,y_train))
-print("The Testing R Square value is: %2f"%lr_model.score(X_test,y_test))
+print("The Training R Square value is: %2f"%lr.score(X_train,y_train))
+print("The Testing R Square value is: %2f"%lr.score(X_test,y_test))
 ```
 
 ```{python}
@@ -961,7 +976,13 @@ lin_model.summary()
 ```
 
 
-# Random Forest Regression Model
+## Random Forest Regression Model
+
+***Random Forest Regression***
+
+Random Forest Regression is a supervised learning technique that does regression using the ensemble learning method. Ensemble learning method is a methodology that integrates predictions from numerous machine learning algorithms to generate a more accurate forecast than a single model.
+Each tree is built from a separate set of rows, and a new set of characteristics is chosen for splitting at each node. Each of the trees provides a unique forecast. These forecasts are then averaged to get a single outcome.
+
 
 ```{python}
 #Defining X and y Variables for Train and Test Split
@@ -997,29 +1018,20 @@ R_Square_Score=r2_score(y,Pred)
 Mean_Square_error=mean_squared_error(y,Pred)
 print('Mean Squared Error of Random Forest Regression: ',round(Mean_Square_error,5))
 print('R Square value of Random Forest Regression:',round(R_Square_Score,6))
-print("The Training R Square value is: %2f"%Reg_model.score(X_train,y_train))
-print("The Testing R Square value is: %2f"%Reg_model.score(X_test,y_test))
+print("The Training R Square value is: %2f"%regressor.score(X_train,y_train))
+print("The Testing R Square value is: %2f"%regressor.score(X_test,y_test))
 ```
-
-
-
-```{python}
-# How many NAs in column Education and Race?
-old_df['Education'].isna().sum()
-# 32272
-
-old_df['Race'].isna().sum()
-# 40215
-
-```
-
-
-
-
-# Which title (role) in the not-top-10 companies should I look for if I want to earn my salary over 200K a year. (I have 3-year of work experience and want to find a job in NY)
-
-# What's the range of yearly salay of a male works in top 10 company in CA (no work experience)?
 
 
 # Conclusion
+
+```{python}
+# 1.	The means salary of each job position is different from each other.
+# 2.	The average salary of gender is not equal
+# 3.	The average yearly salary in the US top 10 companies was higher than not-top-10 companies’ average yearly salary
+# 4.	Working in the same company for more years does not mean those people have higher salaries
+# 5.	The means of yearly salary from 2018 to 2021 are not equal
+# 6.	Yearly salary won’t affect much by years of experience.
+# 7.	Random Forest Regression is a better model with high R Square when compared to the Linear Regression
+```
 

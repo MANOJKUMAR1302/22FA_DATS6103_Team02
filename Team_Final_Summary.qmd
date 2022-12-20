@@ -717,7 +717,7 @@ print(results)
 
 ```
 
-To find out whether the means for the two groups are equal or not. The result shows that the mean yearlysalary for top 10 companies is 212,371 USD, was significantly higher than the mean yearlysalary of not-top-10 companies, which is 179779 USD. Also, because the p-value < 0.05, we can conclude that the means for the two groups are not equal.
+By the Independent-Sample T Test, we can find out whether the means for the two groups are equal or not. The result shows that the mean yearlysalary for top 10 companies is 212,371 USD, was significantly higher than the mean yearlysalary of not-top-10 companies, which is 179779 USD. Also, because the p-value < 0.05, we can conclude that the means for the two groups are not equal.
 
 
 ## Is working for more years in the same company affect the salary? 
@@ -1094,6 +1094,8 @@ After comparing the rsquare values of both Linear and Random Forest Regression, 
 7.	Random Forest Regression is a better model with high R Square when compared to the Linear Regression
 
 # Reference
+
+Ogozaly, J. (2021, October 10). Data Science and STEM salaries. Kaggle. Retrieved December 20, 2022, from https://www.kaggle.com/datasets/jackogozaly/data-science-and-stem-salaries?resource=download 
 
 Fortune 500. (2022, December 16). Fortune. https://fortune.com/ranking/fortune500/
 

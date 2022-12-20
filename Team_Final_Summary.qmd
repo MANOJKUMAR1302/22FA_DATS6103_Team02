@@ -9,6 +9,7 @@ format:
         toc-depth: 6
         toc-float: true
         toc-location: left
+        page-layout: full
 execute: 
   echo: false
   result: hide
@@ -16,11 +17,13 @@ execute:
 ---
 # Introduction
 
-## Data Science and Stem Salaries
+Information technology is unquestionably one of the most rapidly increasing fields. According to the US Bureau of Labor Statistics, the IT industry is predicted to rise by 13% between 2020 and 2030. This is quicker than the average for all jobs, with computer and IT occupations earning more than twice as much as other occupations. A career in technology offers various advantages, one of which is a high compensation.
 
-## Prior Reserch and Analysis
+A young professional or recent graduate has various fascinating possibilities in the technology area to select from, such as Data Science courses, AI & ML courses, and so on. A profession in technology may be found in a variety of settings, including fast-paced startups, creative technological businesses, and tiny IT departments.
 
-## About the Dataset
+Our initiative is all about assisting recent graduates who are eager to enter the IT business by placing them in the highest-paying professions available and providing an approximate estimate of their wages depending on the criteria.
+
+# Description of the Data
 
 This dataset is collected from Kaggle in order to explore Data Science and Stem Salaries.
 
@@ -28,18 +31,16 @@ Our original dataset has approximately 62,000 observations with 29 features.
 
 There are some duplicates, null values and outliers in our dataset. After removing the duplicates, null values and outliers in our dataset we are left with 35973 observations.
 
-
-
 We have considered the below mentioned features in our final dataset:
 
-timestamp: When the data was recorded
-company: Company name into which employee got selected
-title: Jop title of the employee
-yearlysalary: Amount of salary earned by the employee
-location: Job location 
-yearsofexperience: Year of Experience
-yearsatcompany: Years of experience at same company
-gender: Male or Female 
+__timestamp__: When the data was recorded<br>
+__company__: Company name into which employee got selected<br>
+__title__: Jop title of the employee<br>
+__yearlysalary__: Amount of salary earned by the employee<br>
+__location__: Job location <br>
+__yearsofexperience__: Year of Experience<br>
+__yearsatcompany__: Years of experience at same company<br>
+__gender__: Male or Female <br>
 
 ```{python}
 #| output: false
@@ -81,13 +82,17 @@ df['yearlysalary'] = old_df['totalyearlycompensation']
 df['timestamp'] = pd.to_datetime(df['timestamp']).dt.strftime('%Y')
 ```
 
-Salary histogram for checking normality before removing NA Values, Duplicates and Outliers.
+First of all, let's look at whether the dependent variable, salary, has normality shape.
 ```{python}
 # salary histogram for checking normality
 sns.distplot(df.yearlysalary, fit = stats.norm)
+plt.show()
 ```
 
+Our salary data has highly right-skewed distribution. We are going to remove null values and outliers.
+
 ```{python}
+#| output: false
 # Removing a row which has irrelavent value for feature Gender='Title: Senior Software Engineer'
 df=df.drop(labels=11010,axis=0)
 
@@ -137,8 +142,8 @@ df3=df3[df3['yearsofexperience'] > np.percentile(df3['yearsofexperience'],25)-n*
 print ("Shape Of The After removing yearsofexperience Outliers: ",df3.shape)
 ```
 
-Head and Summary of dataframe after removing NA Values, duplicates and outliers
 ```{python}
+#| output: false
 Reference_dataframe=df3
 # Observing the first five rows of the dataframe after removing duplicates, null values, and Outliers
 print(df3.head())
@@ -147,36 +152,40 @@ print(df3.head())
 df3.describe()
 ```
 
-Salary histogram for checking normality after removing NA Values, Duplicates and Outliers.
+Below is the histogram for salary data after removing NA Values, Duplicates and Outliers.
 ```{python}
 # salary histogram for chekciing normality
 sns.distplot(df3.yearlysalary, fit = stats.norm)
+plt.show()
 ```
+
+Now, the distribution is closer to normalization and we are able to analyze salary data.
 
 # Exploratory Data Analysis
 
 ## Which job position has highest earning? Over time, salary by job title is changed?
 
-Unique titles in our dataset
+In the dataset, there are total 15 unique titles:
 ```{python}
 print (pd.unique(df3.title))
-print (df3['title'].nunique())
+# print (df3['title'].nunique())
 ```
 
-Piechart for each job title and their repsective percentages
+
 ```{python}
+# Piechart for each job title and their repsective percentages
 print (df3['title'].value_counts())
 fig = px.pie(df3, names = 'title', title = 'Title')
 fig.show()
 ```
 
-Avg salary by title
-```{python}
 
+```{python}
+#Average salary by title
 avgsalary = df3.groupby('title').mean()['yearlysalary'].reset_index()
 print (avgsalary)
 
-avgsalary.plot(kind = 'bar', x = 'title', y = 'yearlysalary', title = 'Average Salary by Job Title', figsize=(15,8))
+avgsalary.plot(kind = 'bar', x = 'title', y = 'yearlysalary', title = 'Average Salary by Job Title', figsize=(10,3))
 plt.show()
 
 
@@ -191,9 +200,10 @@ plt.setp(titleboxplot.get_xticklabels(), rotation=90)
 plt.show()
 ```
 
-Software engineering manager has highest earning.
+Our dataset have the most Software Engineer about 70% and Software engineering manager has highest earning.
 
-2018 top 5 highest earner
+Let's look at top 5 earner by each year.
+
 ```{python}
 # 2018 top 5 highest earner
 df2018 = df3[df3.timestamp=='2018']
@@ -202,9 +212,8 @@ highearn1 = highearn1.nlargest(5, ['yearlysalary'])
 highearn1
 ```
 
-In 2018, highest job positions are Software Engineer, Data Scientist, Software Engineering Manager.
+In 2018, highest job positions are Software Engineer, Data Scientist, Software Engineering Manager. Apparent feature is the salary of software engineer who has 14 years work experience in WA is almost same with or a little bit lower than whom has less work experience in CA or NY.
 
-2019 top 10 highest earner
 ```{python}
 # 2019 top 10 highest earner
 
@@ -215,9 +224,8 @@ highearn2 = highearn2.nlargest(5, ['yearlysalary'])
 highearn2
 ```
 
-In 2019, highest job positions are Product Manager, Software Engineer, Software Engineering Manager.
+In 2019, highest job positions are Product Manager, Software Engineer, Software Engineering Manager. From 2019, overall salary is a little bit higher than 2018. Work experience is also differ from 5 to 10 years. This time, software engineer who is in Switzerland is ranked.
 
-2020 top 10 highest earner
 ```{python}
 # 2020 top 10 highest earner
 
@@ -228,9 +236,8 @@ highearn3 = highearn3.nlargest(5, ['yearlysalary'])
 highearn3
 ```
 
-In 2020, highest job positions are Software Engineer, Software Engineering Manager, Hardware Engineer, Product Manager, Data Scientist.
+In 2020, highest job positions are Software Engineer, Software Engineering Manager, Hardware Engineer, Product Manager, Data Scientist. This year, work experience year is higher than previous years and all location is in CA.
 
-2021 top 10 highest earner
 ```{python}
 # 2021 top 10 highest earner
 
@@ -241,16 +248,19 @@ highearn4 = highearn4.nlargest(5, ['yearlysalary'])
 highearn4
 ```
 
-In 2021, highest job positions are Software Engineer, Software Engineering Manager, Data Scientist, Product Manager.
+In 2021, highest job positions are Software Engineer, Software Engineering Manager, Data Scientist, Product Manager. This year, Software Engineer who is in WA, US and Canada  is ranked. 
 
-From 2018 to 2021, job position such as Software Engineer, Software Engineering Manager, Data Scientist, Product Manager, Hardware Engineer made highly earning. 
+From 2018 to 2021, job position such as Software Engineer, Software Engineering Manager, Data Scientist, Product Manager, Hardware Engineer made highly earning. But, we can conclude that job title is not only factor to earn more money. 
 
+### ANOVA for Job Position by Each Year
+We implemented an ANOVA to investigate whether the average salary for each job position changes over year.
 
-ANOVA Test for the salary of the job position per year
+First, ANOVA for Software Engineer.
 
+_H₀: Year by year salary means of software engineer are equal_<br>
+_H₁: Year by year salary means of software engineer are not equal_<br>
+<br>
 ```{python}
-# H₀: Year by year salary means of software engineer are equal.
-# H₁: Year by year salary means of software engineer are not equal.
 # α = 0.05
 
 SE = df3[df3['title'] == 'Software Engineer']
@@ -288,7 +298,7 @@ SE_anova_table['F']['Between Groups'] = F
 SE_anova_table['P-value']['Between Groups'] = 1 - stats.f.cdf(F, SE_anova_table['df']['Between Groups'], SE_anova_table['df']['Within Groups'])
 
 # F critical 
-alpha = 0.01
+alpha = 0.05
 # possible types "right-tailed, left-tailed, two-tailed"
 tail_hypothesis_type = "two-tailed"
 if tail_hypothesis_type == "two-tailed":
@@ -299,7 +309,6 @@ SE_anova_table['F crit']['Between Groups'] = stats.f.ppf(1-alpha, SE_anova_table
 SE_anova_table
 ```
 
-Results of the salary of the job position per year
 ```{python}
 print("The p-value approach to hypothesis testing in the decision rule")
 conclusion = "Failed to reject the null hypothesis."
@@ -312,10 +321,15 @@ print(conclusion)
 
 ```
 
-ANOVA Test on Software Engineering Manager Title
+As a result, year by year salary means of Software Engineer are not equal.
+
+Second, ANOVA for Software Engineering Manager.
+
+_H₀: Year by year salary means of Software Engineering Manager are equal_<br>
+_H₁: Year by year salary means of Software Engineering Manager are not equal_<br>
+
 ```{python}
-# H₀: Year by year salary means of Software Engineering Manager are equal.
-# H₁: Year by year salary means of Software Engineering Manager are not equal.
+
 # α = 0.05
 
 # Data Scientist, Product Manager, Hardware Engineer
@@ -354,7 +368,7 @@ SEM_anova_table['F']['Between Groups'] = F
 SEM_anova_table['P-value']['Between Groups'] = 1 - stats.f.cdf(F, SEM_anova_table['df']['Between Groups'], SEM_anova_table['df']['Within Groups'])
 
 # F critical 
-alpha = 0.01
+alpha = 0.05
 # possible types "right-tailed, left-tailed, two-tailed"
 tail_hypothesis_type = "two-tailed"
 if tail_hypothesis_type == "two-tailed":
@@ -365,7 +379,6 @@ SEM_anova_table['F crit']['Between Groups'] = stats.f.ppf(1-alpha, SEM_anova_tab
 SEM_anova_table
 ```
 
-Conclusion of Software Engineering Manager Title
 ```{python}
 print("The p-value approach to hypothesis testing in the decision rule")
 conclusion = "Failed to reject the null hypothesis."
@@ -378,10 +391,14 @@ print(conclusion)
 
 ```
 
-ANOVA Test on Data Scientist Title
+As a result, year by year salary means of Software Engineering Manager are not equal.
+
+Third, ANOVA for Data Scientist.
+
+_H₀: Year by year salary means of Data Scientist are equal_<br>
+_H₁: Year by year salary means of Data Scientist are not equal_<br>
+
 ```{python}
-# H₀: Year by year salary means of Data Scientist are equal.
-# H₁: Year by year salary means of Data Scientist are not equal.
 # α = 0.05
 
 # Product Manager, Hardware Engineer
@@ -420,7 +437,7 @@ DS_anova_table['F']['Between Groups'] = F
 DS_anova_table['P-value']['Between Groups'] = 1 - stats.f.cdf(F, DS_anova_table['df']['Between Groups'], DS_anova_table['df']['Within Groups'])
 
 # F critical 
-alpha = 0.01
+alpha = 0.05
 # possible types "right-tailed, left-tailed, two-tailed"
 tail_hypothesis_type = "two-tailed"
 if tail_hypothesis_type == "two-tailed":
@@ -430,7 +447,7 @@ DS_anova_table['F crit']['Between Groups'] = stats.f.ppf(1-alpha, DS_anova_table
 # Final ANOVA Table
 DS_anova_table
 ```
-Conclusion of Data Scientist Title
+
 ```{python}
 print("The p-value approach to hypothesis testing in the decision rule")
 conclusion = "Failed to reject the null hypothesis."
@@ -443,10 +460,15 @@ print(conclusion)
 
 ```
 
-ANOVA Test on Product Manager title
+As a result, year by year salary means of Data Scientist are not equal.
+
+Fourth, ANOVA for Product Manager.
+
+_H₀: Year by year salary means of Product Manager are equal_ <br>
+_H₁: Year by year salary means of Product Manager are not equal_<br>
+
 ```{python}
-# H₀: Year by year salary means of Product Manager are equal.
-# H₁: Year by year salary means of Product Manager are not equal.
+
 # α = 0.05
 
 PM = df3[df3['title'] == 'Product Manager']
@@ -484,7 +506,7 @@ PM_anova_table['F']['Between Groups'] = F
 PM_anova_table['P-value']['Between Groups'] = 1 - stats.f.cdf(F, PM_anova_table['df']['Between Groups'], PM_anova_table['df']['Within Groups'])
 
 # F critical 
-alpha = 0.01
+alpha = 0.05
 # possible types "right-tailed, left-tailed, two-tailed"
 tail_hypothesis_type = "two-tailed"
 if tail_hypothesis_type == "two-tailed":
@@ -495,7 +517,6 @@ PM_anova_table['F crit']['Between Groups'] = stats.f.ppf(1-alpha, PM_anova_table
 PM_anova_table
 ```
 
-Conclusion of Prodcut Manager Title
 ```{python}
 print("The p-value approach to hypothesis testing in the decision rule")
 conclusion = "Failed to reject the null hypothesis."
@@ -508,10 +529,15 @@ print(conclusion)
 
 ```
 
-ANOVA Test on Hardware Engineer Title
+As a reuslt, year by year salary means of Product Manager are not equal.
+
+Last, ANOVA for Hardware Engineer.
+
+_H₀: Year by year salary means of Hardware Engineer are equal_<br>
+_H₁: Year by year salary means of Hardware Engineer are not equal_<br>
+
 ```{python}
-# H₀: Year by year salary means of Hardware Engineer are equal.
-# H₁: Year by year salary means of Hardware Engineer are not equal.
+
 # α = 0.05
 
 HE = df3[df3['title'] == 'Hardware Engineer']
@@ -549,7 +575,7 @@ HE_anova_table['F']['Between Groups'] = F
 HE_anova_table['P-value']['Between Groups'] = 1 - stats.f.cdf(F, HE_anova_table['df']['Between Groups'], HE_anova_table['df']['Within Groups'])
 
 # F critical 
-alpha = 0.01
+alpha = 0.05
 # possible types "right-tailed, left-tailed, two-tailed"
 tail_hypothesis_type = "two-tailed"
 if tail_hypothesis_type == "two-tailed":
@@ -559,7 +585,6 @@ HE_anova_table['F crit']['Between Groups'] = stats.f.ppf(1-alpha, HE_anova_table
 # Final ANOVA Table
 HE_anova_table
 ```
-Conclusion of Hardware Engineer Title
 ```{python}
 print("The p-value approach to hypothesis testing in the decision rule")
 conclusion = "Failed to reject the null hypothesis."
@@ -571,6 +596,8 @@ print(conclusion)
 # Reject H0
 ```
 
+As a result, year by year salary means of Hardware Engineer are not equal.
+
 According to ANOVA, the salary by title over time is statistically significant, which means salary over time per each job position is not equal.
 
 ## How large is the wage disparity between gender?
@@ -578,12 +605,15 @@ According to ANOVA, the salary by title over time is statistically significant, 
 sns.boxplot(data=df3,x = 'gender', y = 'yearlysalary')
 plt.title("Salary by Gender")
 plt.ylim(0,500000,25000)
+plt.show()
 ```
 
-ANOVA Test on Gender Feature
+According to box plot for gender, it looks there is apparent difference beween average salary for gender. But to make sure, let's look at the ANOVA for gender.
+
+_H₀: Salary by gender are equal_<br>
+_H₁: Salary by gender are not equal_<br>
+
 ```{python}
-# H₀: Salary by gender are equal.
-# H₁: Salary by gender are not equal.
 # α = 0.05
 
 gender_ANOVA = [['Between Groups', '', '', '', '', '', ''], ['Within Groups', '', '', '', '', '', ''], ['Total', '', '', '', '', '', '']] 
@@ -629,7 +659,7 @@ gender_anova_table['F crit']['Between Groups'] = stats.f.ppf(1-alpha, gender_ano
 # Final ANOVA Table
 gender_anova_table
 ```
-Conclusion of ANOVA Test of Gender Feature 
+
 ```{python}
 print("The p-value approach to hypothesis testing in the decision rule")
 conclusion = "Failed to reject the null hypothesis."
@@ -641,13 +671,15 @@ print(conclusion)
 # Reject H0
 ```                          
 
+As a result, the salary by gender are not equal which means that average salary by gender is statistically significant.
 
 ## Is there a significant difference between the yearly salary in top 10 companies and the yearly salary in not-top-10 companies?
 
-Overall, there are 1435 different companies in this dataset. Based on the rank on Fortune 500 (2022), we divided the companies into two groups:
-* Top 10 companies:
-Apple, Walmart Labs, Walmart, Amazon, CVS health, UnitedHealth Group, ExxonMobil, and McKesson
-* Not-top-10 companies:
+Overall, there are 1435 different companies in this dataset. Based on the rank on Fortune 500 (2022), we divided the companies into two groups:<br>
+<br>
+* Top 10 companies:<br>
+Apple, Walmart Labs, Walmart, Amazon, CVS health, UnitedHealth Group, ExxonMobil, and McKesson<br>
+* Not-top-10 companies:<br>
 Yahoo, Netflix, Uber, Dell Technologies, Zillow, Airbnb, Cisco, JPMorgan Chase....
 
 
@@ -666,14 +698,15 @@ df3['topcompany']=np.where((df3['company'].isin(["Apple","apple","APPLE","Walmar
 
 ```{python}
 sns.violinplot(x=df3['topcompany'], y=df3["yearlysalary"]).set(title='Distribution of yearly salary')
+plt.show()
 ```
 The violinplot above shows the distribution of the two groups. Obviously, the distribution is different. The TOP 10 Companies’ Yearly Salary is likely higher than Not-Top-10 Companies'.
 
 
 ### Independent-Sample T Test
 
-H0: The means for the two populations are equal
-H1: The means for the two populations are not equal
+_H0: The means for the two populations are equal_<br>
+_H1: The means for the two populations are not equal_<br>
 
 ```{python}
 summary, results = rp.ttest(group1= top10['yearlysalary'], group1_name= "top10",
@@ -725,14 +758,15 @@ The result of Pearson's correlation shows that the strength of the relationship 
 Because of COVID-19, the global economy has changed dramatically. We will use statistic test to analyse if the yearly salary keeps the same in recent 4 years.
 
 
-## Distribution of yearly salary by time stamp
+### Distribution of yearly salary by time stamp
 ```{python}
 sns.violinplot(x=df3['timestamp'], y=df3["yearlysalary"]).set(title='Distribution of yearly salary in 4 years')
+plt.show()
 ```
 From the violinplot, we can see there's a little drop in 2021.
 
 
-## Q-Q Plot (Normality Assumption Check)
+### Q-Q Plot (Normality Assumption Check)
 ```{python}
 
 unique_time = df3['timestamp'].unique()
@@ -744,13 +778,13 @@ for timestamp in unique_time:
 Before we did the hypothesis test, we checked the distribution by Q-Q plot. From the figures, we may assume that the data for each group falls roughly on a straight line.
 
 
-## ANOVA Test
+### ANOVA Test
 
-H₀: μ1= μ2 = μ3 = μ4
-H₁: Not all yearlysalary means are equal
-α = 0.05
+_H₀: μ1= μ2 = μ3 = μ4_<br>
+_H₁: Not all yearlysalary means are equal_<br>
 
 ```{python}
+# α = 0.05
 # Create ANOVA backbone table
 data = [['Between Groups', '', '', '', '', '', ''], ['Within Groups', '', '', '', '', '', ''], ['Total', '', '', '', '', '', '']] 
 anova_table = pd.DataFrame(data, columns = ['Source of Variation', 'SS', 'df', 'MS', 'F', 'P-value', 'F crit']) 
@@ -796,8 +830,6 @@ anova_table['F crit']['Between Groups'] = stats.f.ppf(1-alpha, anova_table['df']
 anova_table
 ```
 
-
-ANOVA Test Result
 ```{python}
 print("The p-value approach to hypothesis testing in the decision rule")
 conclusion = "Failed to reject the null hypothesis."
@@ -820,6 +852,7 @@ plt.title("Yearly Salary vs Year of Experience")
 plt.xticks(rotation='vertical')
 plt.ylim(0,400000,25000)
 plt.xlim(0,35,5)
+plt.show()
 ```
 
 ```{python}
@@ -828,9 +861,10 @@ plt.title("Yearly Salary vs Year of Experience")
 plt.xticks(rotation='vertical')
 plt.ylim(100000,1000000,50000)
 plt.xlim(0,20,5)
+plt.show()
 ```
 
-•	There are lot of fluctuations in the salary of employees in the initial 8-9 years, because of some reasons like constant shifting companies and less salaries in the career beginning and have a constant growth in the salary after that.
+There are lot of fluctuations in the salary of employees in the initial 8-9 years, because of some reasons like constant shifting companies and less salaries in the career beginning and have a constant growth in the salary after that.
 
 ***Pearson’s Correlation Matrix:***
 

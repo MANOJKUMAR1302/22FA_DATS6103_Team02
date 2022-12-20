@@ -632,14 +632,7 @@ List all the companys in this dataframe
 print(f"the unique values:\n{pd.unique(df3.company)}")
 ```
 
-
-Independent-Sample T Test (2 groups)
-
-Top 10 companies in the United States (https://fortune.com/fortune500/)
-
-H0: The means for the two populations are equal.
-H1: The means for the two populations are not equal.
-
+Divided data in to two groups
 ```{python}
 top10 = df3[df3.company.isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil"
 "McKesson"])]
@@ -650,16 +643,16 @@ not10 = df3[~df3.company.isin(["Apple","apple","APPLE","Walmart Labs","Walmart",
 df3['topcompany']=np.where((df3['company'].isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil", "McKesson"])) & (~df3['company'].isin([120,128])),1,0)
 ```
 
-
-Distribution of yearly salary
+Distribution of Yearly Salary for Top 10 companies and Not-top-10 companies
 ```{python}
-
 sns.violinplot(x=df3['topcompany'], y=df3["yearlysalary"]).set(title='Distribution of yearly salary')
-
 ```
 
+Independent-Sample T Test (2 groups)
 
-T-Test
+H0: The means for the two populations are equal
+H1: The means for the two populations are not equal
+
 ```{python}
 summary, results = rp.ttest(group1= top10['yearlysalary'], group1_name= "top10",
                             group2= not10['yearlysalary'], group2_name= "not10")
@@ -668,7 +661,6 @@ print(summary)
 print(results)
 
 ```
-The average yearlysalary for top 10 company, M= 355205.521 , was statistically signigicantly higher than those not-top-10 companies(M= 320767.298); t= 23.239, p < 0.05
 
 
 # 4. Is working for more years in the same company affect the salary? 
@@ -680,7 +672,7 @@ sns.histplot(data=df3, x="yearsatcompany", bins = 8, binrange = (0.5, 8.5)).set_
 plt.show()
 
 
-sns.boxplot(x="topcompany", y="yearsatcompany", data=df3, palette="Set1", width=0.5).set_title('Years at Company')
+sns.boxplot(x =df3['yearsatcompany'])
 plt.show()
 
 ```
@@ -702,9 +694,9 @@ print('Pearsons correlation: %.3f' % corr)
 ```
 
 
-# 5. In the recent five years, the average salary keeps the same?
+# 5. In the recent four years, the average salary keeps the same?
 
-Distribution of yearly by timestamp
+Distribution of yearlysalary by timestamp
 ```{python}
 sns.violinplot(x=df3['timestamp'], y=df3["yearlysalary"]).set(title='Distribution of yearly salary in 4 years')
 ```
@@ -723,13 +715,12 @@ From the above figure, we may assume that the data for each group falls roughly 
 
 
 ANOVA Test
+
+H₀: μ1= μ2 = μ3 = μ4
+H₁: Not all yearlysalary means are equal
+α = 0.05
+
 ```{python}
-# Hypothesis Testing
-# H₀: μ1= μ2 = μ3 = μ4
-# H₁: Not all yearlysalary means are equal
-# α = 0.05
-
-
 # Create ANOVA backbone table
 data = [['Between Groups', '', '', '', '', '', ''], ['Within Groups', '', '', '', '', '', ''], ['Total', '', '', '', '', '', '']] 
 anova_table = pd.DataFrame(data, columns = ['Source of Variation', 'SS', 'df', 'MS', 'F', 'P-value', 'F crit']) 
@@ -988,15 +979,3 @@ print('R Square value of Random Forest Regression:',round(R_Square_Score,6))
 print("The Training R Square value is: %2f"%regressor.score(X_train,y_train))
 print("The Testing R Square value is: %2f"%regressor.score(X_test,y_test))
 ```
-
-
-
-# Conclusion
-
-1.	The means salary of each job position is different from each other.
-2.	The average salary of gender is not equal
-3.	The average yearly salary in the US top 10 companies was higher than not-top-10 companies’ average yearly salary
-4.	Working in the same company for more years does not mean those people have higher salaries
-5.	The means of yearly salary from 2018 to 2021 are not equal
-6.	Yearly salary won’t affect much by years of experience.
-7.	Random Forest Regression is a better model with high R Square when compared to the Linear Regression

@@ -644,19 +644,16 @@ print(conclusion)
 
 ## Is there a significant difference between the yearly salary in top 10 companies and the yearly salary in not-top-10 companies?
 
-List all the companys in this dataframe
-```{python}
-print(f"the unique values:\n{pd.unique(df3.company)}")
-```
+Overall, there are 1435 different companies in this dataset. Based on the rank on Fortune 500 (2022), we divided the companies into two groups:
+* Top 10 companies:
+Apple, Walmart Labs, Walmart, Amazon, CVS health, UnitedHealth Group, ExxonMobil, and McKesson
+* Not-top-10 companies:
+Yahoo, Netflix, Uber, Dell Technologies, Zillow, Airbnb, Cisco, JPMorgan Chase....
 
 
-Independent-Sample T Test (2 groups)
+### Distribution of Top 10 companies and Not-top-10 companies
 
-Top 10 companies in the United States (https://fortune.com/fortune500/)
-
-H0: The means for the two populations are equal.
-H1: The means for the two populations are not equal.
-
+First, we divided the data in to two groups. Next, we add a new boolean column called "topcompany". If the company is in Top 10 companies shows 1, if not shows 0.
 ```{python}
 top10 = df3[df3.company.isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil"
 "McKesson"])]
@@ -667,16 +664,17 @@ not10 = df3[~df3.company.isin(["Apple","apple","APPLE","Walmart Labs","Walmart",
 df3['topcompany']=np.where((df3['company'].isin(["Apple","apple","APPLE","Walmart Labs","Walmart","walmart","Amazon","amazon","AMAZON","CVS health","cvs health","CVS Health","UnitedHealth Group","ExxonMobil", "McKesson"])) & (~df3['company'].isin([120,128])),1,0)
 ```
 
-
-Distribution of yearly salary
 ```{python}
-
 sns.violinplot(x=df3['topcompany'], y=df3["yearlysalary"]).set(title='Distribution of yearly salary')
-
 ```
+The violinplot above shows the distribution of the two groups. Obviously, the distribution is different. The TOP 10 Companies’ Yearly Salary is likely higher than Not-Top-10 Companies'.
 
 
-T-Test Results of Top10 and NonTop10 companies 
+### Independent-Sample T Test
+
+H0: The means for the two populations are equal
+H1: The means for the two populations are not equal
+
 ```{python}
 summary, results = rp.ttest(group1= top10['yearlysalary'], group1_name= "top10",
                             group2= not10['yearlysalary'], group2_name= "not10")
@@ -685,49 +683,56 @@ print(summary)
 print(results)
 
 ```
-The average yearlysalary for top 10 company, M= 355205.521 , was statistically signigicantly higher than those not-top-10 companies(M= 320767.298); t= 23.239, p < 0.05
+
+To find out whether the means for the two groups are equal or not. The result shows that the mean yearlysalary for top 10 companies is 212,371 USD, was significantly higher than the mean yearlysalary of not-top-10 companies, which is 179779 USD. Also, because the p-value < 0.05, we can conclude that the means for the two groups are not equal.
 
 
 ## Is working for more years in the same company affect the salary? 
 
-Distribution of yeas at company
+We usually think our colleagues who join the company for more years get higher salaries, but let’s see what this dataset showed.
+
+### Distribution of yeas at company
 ```{python}
 
 sns.histplot(data=df3, x="yearsatcompany", bins = 8, binrange = (0.5, 8.5)).set_title('Years at Company')
 plt.show()
 
 
-sns.boxplot(x="topcompany", y="yearsatcompany", data=df3, palette="Set1", width=0.5).set_title('Years at Company')
+sns.boxplot(x =df3['yearsatcompany'])
 plt.show()
 
 ```
+The distribution of years at company shows that most of people in this dataset had only been in their companies for 0 to 8 years. The median is 2 years.
 
 
-Scatterplot & Linear Regression Fit Line
+### Scatterplot & Linear Regression Fit Line
 ```{python}
-sns.regplot(x=df3["yearsatcompany"], y=df3["yearlysalary"], line_kws={"color":"r","alpha":0.7,"lw":2}).set_title('After removing outliers')
+sns.regplot(x=df3["yearsatcompany"], y=df3["yearlysalary"], line_kws={"color":"r","alpha":0.7,"lw":2}).set_title('yearlysalary v.s. yearsatcompany')
 plt.show()
-
 ```
+According to the scatterplot, there’s no linear relationship between Yearly Salary and Years at Company.
 
-
-calculate the Pearson's correlation between two variables
+### Pearson's correlation between two variables
 ```{python}
 from scipy.stats import pearsonr
 corr, _ = pearsonr(df3['yearsatcompany'], df3['yearlysalary'])
 print('Pearsons correlation: %.3f' % corr)
 ```
+The result of Pearson's correlation shows that the strength of the relationship between the two variables was Very Weak. So we can conclude that working in the same company for more years does not mean those people have higher salaries.
 
 
-## In the recent five years, the average salary keeps the same?
+## In the recent four years, the average salary keeps the same?
+Because of COVID-19, the global economy has changed dramatically. We will use statistic test to analyse if the yearly salary keeps the same in recent 4 years.
 
-Distribution of yearly by timestamp
+
+## Distribution of yearly salary by time stamp
 ```{python}
 sns.violinplot(x=df3['timestamp'], y=df3["yearlysalary"]).set(title='Distribution of yearly salary in 4 years')
 ```
+From the violinplot, we can see there's a little drop in 2021.
 
 
-Q-Q Plot (Normality Assumption Check)
+## Q-Q Plot (Normality Assumption Check)
 ```{python}
 
 unique_time = df3['timestamp'].unique()
@@ -736,17 +741,16 @@ for timestamp in unique_time:
     plt.title("Probability Plot - " +  timestamp)
     plt.show()
 ```
-From the above figure, we may assume that the data for each group falls roughly on a straight line.
+Before we did the hypothesis test, we checked the distribution by Q-Q plot. From the figures, we may assume that the data for each group falls roughly on a straight line.
 
 
-ANOVA Test for different timestamp
+## ANOVA Test
+
+H₀: μ1= μ2 = μ3 = μ4
+H₁: Not all yearlysalary means are equal
+α = 0.05
+
 ```{python}
-# Hypothesis Testing
-# H₀: μ1= μ2 = μ3 = μ4
-# H₁: Not all yearlysalary means are equal
-# α = 0.05
-
-
 # Create ANOVA backbone table
 data = [['Between Groups', '', '', '', '', '', ''], ['Within Groups', '', '', '', '', '', ''], ['Total', '', '', '', '', '', '']] 
 anova_table = pd.DataFrame(data, columns = ['Source of Variation', 'SS', 'df', 'MS', 'F', 'P-value', 'F crit']) 
@@ -805,6 +809,7 @@ print(conclusion)
 # Rejact H0
 
 ```
+Based on the result, the p-value < 0.05, so the null hypothesis is rejected. Not all yearly salary means are equal.
 
 
 ## How much do the employee's experience affect his or her salary?
@@ -1053,4 +1058,8 @@ After comparing the rsquare values of both Linear and Random Forest Regression, 
 5.	The means of yearly salary from 2018 to 2021 are not equal
 6.	Yearly salary won’t affect much by years of experience.
 7.	Random Forest Regression is a better model with high R Square when compared to the Linear Regression
+
+# Reference
+
+Fortune 500. (2022, December 16). Fortune. https://fortune.com/ranking/fortune500/
 

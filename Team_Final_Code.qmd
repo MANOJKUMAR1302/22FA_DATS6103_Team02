@@ -28,6 +28,7 @@ import researchpy as rp
 from scipy.stats import pearsonr
 import pandas_profiling as pp
 
+
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
 pd.set_option('display.width', 1000)
@@ -166,6 +167,9 @@ print (df3['title'].nunique())
 ```
 
 ```{python}
+
+# %pip install nbformat 
+
 print (df3['title'].value_counts())
 fig = px.pie(df3, names = 'title', title = 'Title')
 fig.show()
@@ -668,11 +672,11 @@ print(results)
 Distribution of yeas at company
 ```{python}
 
-sns.histplot(data=df3, x="yearsatcompany", bins = 8, binrange = (0.5, 8.5)).set_title('Years at Company')
+sns.histplot(data=df3, x="yearsatcompany", bins = 8, binrange = (0.5, 8.5)).set_title('Histogram of Years at Company')
 plt.show()
 
 
-sns.boxplot(x =df3['yearsatcompany'])
+sns.boxplot(x =df3['yearsatcompany']).set_title('Boxplot of Years at Company')
 plt.show()
 
 ```
@@ -680,7 +684,7 @@ plt.show()
 
 Scatterplot & Linear Regression Fit Line
 ```{python}
-sns.regplot(x=df3["yearsatcompany"], y=df3["yearlysalary"], line_kws={"color":"r","alpha":0.7,"lw":2}).set_title('After removing outliers')
+sns.regplot(x=df3["yearsatcompany"], y=df3["yearlysalary"], line_kws={"color":"r","alpha":0.7,"lw":2}).set_title('Yearly Salary vs Years at Company')
 plt.show()
 
 ```

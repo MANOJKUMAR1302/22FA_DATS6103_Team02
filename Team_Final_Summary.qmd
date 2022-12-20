@@ -651,7 +651,7 @@ Apple, Walmart Labs, Walmart, Amazon, CVS health, UnitedHealth Group, ExxonMobil
 Yahoo, Netflix, Uber, Dell Technologies, Zillow, Airbnb, Cisco, JPMorgan Chase....
 
 
-### Distribution of Top 10 companies and Not-top-10 companies
+### Distribution of Yearly Salary for Top 10 companies and Not-top-10 companies
 
 First, we divided the data in to two groups. Next, we add a new boolean column called "topcompany". If the company is in Top 10 companies shows 1, if not shows 0.
 ```{python}

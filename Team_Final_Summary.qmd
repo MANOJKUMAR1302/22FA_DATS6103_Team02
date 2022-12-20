@@ -874,7 +874,7 @@ One hot encoding can be defined as the important process of changing the categor
 Checking for Unique Variables
 ```{python}
 # Checking for Unique Variables
-for col in dataframe.columns:
+for col in Reference_dataframe.columns:
     print(col, ':', len(df3[col].unique()))
 ```
 
@@ -924,6 +924,7 @@ df_dummies2 = pd.get_dummies(df_dummies1, columns=['title'])
 # After applying One Hot Encoding on company and location and Creating Dummies for gender, timestamp and title
 df_dummies2.shape
 
+# To perform Statmodels we removed spaces and commas from the names.
 # To Replace ' ' with '' in column heading
 df_dummies2.columns=df_dummies2.columns.str.replace(' ','')
 

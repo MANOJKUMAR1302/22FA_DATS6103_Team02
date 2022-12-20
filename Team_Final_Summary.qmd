@@ -1041,6 +1041,7 @@ print("The Training R Square value is: %2f"%regressor.score(X_train,y_train))
 print("The Testing R Square value is: %2f"%regressor.score(X_test,y_test))
 ```
 
+After comparing the rsquare values of both Linear and Random Forest Regression, we got to know that the Random forest model is better model for this dataset.
 
 # Conclusion
 

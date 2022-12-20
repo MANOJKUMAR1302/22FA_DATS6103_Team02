@@ -135,10 +135,13 @@ df3=df3[df3['yearsofexperience'] < np.percentile(df3['yearsofexperience'],75)+n*
 #outlier = Q1 - n*IQR 
 df3=df3[df3['yearsofexperience'] > np.percentile(df3['yearsofexperience'],25)-n*IQR_3]
 print ("Shape Of The After removing yearsofexperience Outliers: ",df3.shape)
+```
 
-dataframe=df3
+Head and Summary of dataframe after removing NA Values, duplicates and outliers
+```{python}
+Reference_dataframe=df3
 # Observing the first five rows of the dataframe after removing duplicates, null values, and Outliers
-df3.head()
+print(df3.head())
 
 # Descriptive Statistics Summary of the dataframe after removing duplicates, null values, and Outliers
 df3.describe()
@@ -243,7 +246,7 @@ In 2021, highest job positions are Software Engineer, Software Engineering Manag
 From 2018 to 2021, job position such as Software Engineer, Software Engineering Manager, Data Scientist, Product Manager, Hardware Engineer made highly earning. 
 
 
-Hypothesis Testing for the salary of the job position per year
+ANOVA Test for the salary of the job position per year
 
 ```{python}
 # H₀: Year by year salary means of software engineer are equal.
@@ -295,6 +298,8 @@ SE_anova_table['F crit']['Between Groups'] = stats.f.ppf(1-alpha, SE_anova_table
 # Final ANOVA Table
 SE_anova_table
 ```
+
+Results of the salary of the job position per year
 ```{python}
 print("The p-value approach to hypothesis testing in the decision rule")
 conclusion = "Failed to reject the null hypothesis."
@@ -307,6 +312,7 @@ print(conclusion)
 
 ```
 
+ANOVA Test on Software Engineering Manager Title
 ```{python}
 # H₀: Year by year salary means of Software Engineering Manager are equal.
 # H₁: Year by year salary means of Software Engineering Manager are not equal.
@@ -358,6 +364,8 @@ SEM_anova_table['F crit']['Between Groups'] = stats.f.ppf(1-alpha, SEM_anova_tab
 # Final ANOVA Table
 SEM_anova_table
 ```
+
+Conclusion of Software Engineering Manager Title
 ```{python}
 print("The p-value approach to hypothesis testing in the decision rule")
 conclusion = "Failed to reject the null hypothesis."
@@ -370,6 +378,7 @@ print(conclusion)
 
 ```
 
+ANOVA Test on Data Scientist Title
 ```{python}
 # H₀: Year by year salary means of Data Scientist are equal.
 # H₁: Year by year salary means of Data Scientist are not equal.
@@ -421,6 +430,7 @@ DS_anova_table['F crit']['Between Groups'] = stats.f.ppf(1-alpha, DS_anova_table
 # Final ANOVA Table
 DS_anova_table
 ```
+Conclusion of Data Scientist Title
 ```{python}
 print("The p-value approach to hypothesis testing in the decision rule")
 conclusion = "Failed to reject the null hypothesis."
@@ -433,6 +443,7 @@ print(conclusion)
 
 ```
 
+ANOVA Test on Product Manager title
 ```{python}
 # H₀: Year by year salary means of Product Manager are equal.
 # H₁: Year by year salary means of Product Manager are not equal.
@@ -483,6 +494,8 @@ PM_anova_table['F crit']['Between Groups'] = stats.f.ppf(1-alpha, PM_anova_table
 # Final ANOVA Table
 PM_anova_table
 ```
+
+Conclusion of Prodcut Manager Title
 ```{python}
 print("The p-value approach to hypothesis testing in the decision rule")
 conclusion = "Failed to reject the null hypothesis."
@@ -495,6 +508,7 @@ print(conclusion)
 
 ```
 
+ANOVA Test on Hardware Engineer Title
 ```{python}
 # H₀: Year by year salary means of Hardware Engineer are equal.
 # H₁: Year by year salary means of Hardware Engineer are not equal.
@@ -545,6 +559,7 @@ HE_anova_table['F crit']['Between Groups'] = stats.f.ppf(1-alpha, HE_anova_table
 # Final ANOVA Table
 HE_anova_table
 ```
+Conclusion of Hardware Engineer Title
 ```{python}
 print("The p-value approach to hypothesis testing in the decision rule")
 conclusion = "Failed to reject the null hypothesis."
@@ -661,7 +676,7 @@ sns.violinplot(x=df3['topcompany'], y=df3["yearlysalary"]).set(title='Distributi
 ```
 
 
-T-Test
+T-Test Results of Top10 and NonTop10 companies 
 ```{python}
 summary, results = rp.ttest(group1= top10['yearlysalary'], group1_name= "top10",
                             group2= not10['yearlysalary'], group2_name= "not10")
@@ -724,7 +739,7 @@ for timestamp in unique_time:
 From the above figure, we may assume that the data for each group falls roughly on a straight line.
 
 
-ANOVA Test
+ANOVA Test for different timestamp
 ```{python}
 # Hypothesis Testing
 # H₀: μ1= μ2 = μ3 = μ4
@@ -824,14 +839,14 @@ The three possible research hypotheses state whether or not there is a linear re
 
 ```{python}
 # Pearson Correlation Matrix
-pearsoncorr=dataframe.corr(method='pearson')
+pearsoncorr=Reference_dataframe.corr(method='pearson')
 pearsoncorr
 ```
 
 
 ```{python}
 # Pearsons Correlation matrix Using Heatmap
-corr_matrix = dataframe.corr()
+corr_matrix = Reference_dataframe.corr()
 print(corr_matrix)
 
 plt.figure(figsize=(12,10))
@@ -950,6 +965,7 @@ lr.fit(X_train,y_train)
 y_pred = lr.predict(X_test)
 ```
 
+Metrics of Linear Regression
 ```{python}
 # Importing metrics for the evaluation of the model
 from sklearn.metrics import r2_score,mean_squared_error
@@ -963,11 +979,13 @@ print("The Training R Square value is: %2f"%lr.score(X_train,y_train))
 print("The Testing R Square value is: %2f"%lr.score(X_test,y_test))
 ```
 
+Intercepts and Coefficients of Linear Regression
 ```{python}
 print("Intercepts of Linear Regression:",lr.intercept_)
 print("Coefficients of Linear Regression:",lr.coef_)
 ```
 
+Summary of OLS StatModels
 ```{python}
 import statsmodels
 import statsmodels.formula.api as smf
@@ -1010,6 +1028,7 @@ regressor.fit(X, y)
 Pred=regressor.predict(X)
 ```
 
+Metrics of Random Forest Regression
 ```{python}
 from sklearn.metrics import r2_score
 
@@ -1025,13 +1044,11 @@ print("The Testing R Square value is: %2f"%regressor.score(X_test,y_test))
 
 # Conclusion
 
-```{python}
-# 1.	The means salary of each job position is different from each other.
-# 2.	The average salary of gender is not equal
-# 3.	The average yearly salary in the US top 10 companies was higher than not-top-10 companies’ average yearly salary
-# 4.	Working in the same company for more years does not mean those people have higher salaries
-# 5.	The means of yearly salary from 2018 to 2021 are not equal
-# 6.	Yearly salary won’t affect much by years of experience.
-# 7.	Random Forest Regression is a better model with high R Square when compared to the Linear Regression
-```
+1.	The means salary of each job position is different from each other.
+2.	The average salary of gender is not equal
+3.	The average yearly salary in the US top 10 companies was higher than not-top-10 companies’ average yearly salary
+4.	Working in the same company for more years does not mean those people have higher salaries
+5.	The means of yearly salary from 2018 to 2021 are not equal
+6.	Yearly salary won’t affect much by years of experience.
+7.	Random Forest Regression is a better model with high R Square when compared to the Linear Regression
 
